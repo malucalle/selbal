@@ -1,0 +1,27 @@
+Package: selbal
+Type: Package
+Title: Finding highly - associated balances with the response variable.
+Version: 0.1.0
+Author: Javier Rivera-Pinto
+Maintainer: <jrivera@irsicaixa.es>
+Description: it selects a balance associated to a given response variable and evaluates its robustness through a cross - validation procedure.
+License: GPL-3
+LazyData: TRUE
+Imports: compositions,
+ 	 doParallel,
+ 	 foreach,
+	 ggplot2,
+	 grid,
+	 gridExtra,
+	 gtable,
+	 plyr,
+	 pROC,
+	 qdapRegex,
+	 zCompositions,
+	 CMA,
+	 phyloseq
+biocViews: 
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
