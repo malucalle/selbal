@@ -26,7 +26,7 @@ To start using `selbal` we recomend to:
 
 	- Read the submitted manuscript []
 	- Use the `help()` functions for getting a detailed instructions of their
-use.
+	  use.
 	- Read the associated vignette (see vignette folder).
 
 
