@@ -15,7 +15,7 @@ the following instructions:
 
 ```
 # Installing the files in the repository
-  devtools::install_github(repo = "UVic-omics/selbal/")
+  devtools::install_github(repo = "UVic-omics/selbal")
 # Loading the library
   library("selbal")
 ```
