@@ -1635,14 +1635,14 @@
               "\n###############################################################"))
 
     # Build a list with the elements of interest
-    L <- list(mse = MSE.Boxplot,
-              imp.plot = IMP.plot,
+    L <- list(accuracy.nvar = MSE.Boxplot,
+              var.barplot = IMP.plot,
               global.plot = PLOT.Global,
-              bal.tab = dat,
-              accuracy = ACC.Matrix[(opt.M - 1),],
-              balance = BAL,
+              cv.tab = dat,
+              cv.accuracy = ACC.Matrix[(opt.M - 1),],
+              global.balance = BAL,
               glm = FIT.final,
-              opt.M = opt.M)
+              opt.nvar = opt.M)
 
     return(L)
 
