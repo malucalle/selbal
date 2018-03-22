@@ -22,7 +22,7 @@ the following instructions:
 
 To start using `selbal` we recomend to:
 
-- Read the submitted manuscript []
+- Read the submitted manuscript [https://doi.org/10.1101/219386]
 - Use the `help()` functions for getting a detailed instructions of their
   use.
 - Read the associated vignette (see vignette folder).
