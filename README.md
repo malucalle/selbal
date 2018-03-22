@@ -1,9 +1,7 @@
 # selbal
 
-`selbal` a greedy stepwise algorithm for selection of balances or microbial signatures
-that preserves the principles of compositional data analysis. This selection is 
-implemented in order to maximize an association parameter between the proposed
-balance and a given response variable.
+
+ `selbal` is an R package for selection of balances in microbiome compositional data. As described in Rivera-Pinto et al. 2018 _Balances:  a new perspective for microbiome analysis_ https://doi.org/10.1101/219386, `selbal` implements a forward-selection method for the identification of two groups of taxa whose relative abundance, or balance, is associated with the response variable of interest.
 
 ## Getting Started
 
