@@ -126,11 +126,11 @@ In this case we explore a possible association between HIV infection and microbi
 
 `selbal.cv` function returns a list with six elements:
 
-* __[[1]]__: the first element of the list is an image representing the distribution of the accuracy measure as a function of the number of variables included in the balance. This values are from 2 to `maxV` where the red dot represents mean accuracy and the branches the standard errors.
+* __$accuracy.nvar__: the first element of the list is an image representing the distribution of the accuracy measure as a function of the number of variables included in the balance. This values are from 2 to `maxV` where the red dot represents mean accuracy and the branches the standard errors.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-CV.BAL.dic[[1]]
+CV.BAL.dic$accuracy.nvar
 
 ```
 &nbsp;
@@ -139,11 +139,11 @@ In this example, the optimal number of variables is two: the smallest number of 
 
 &nbsp;
 
-* __[[2]]__: the second object in the list is a barplot representing the frequency of the variables selected in some step of the CV process (considering only the balances with at most the optimal number of variables defined in the previous step). 
+* __$var.barplot__: the second object in the list is a barplot representing the frequency of the variables selected in some step of the CV process (considering only the balances with at most the optimal number of variables defined in the previous step). 
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-CV.BAL.dic[[2]]
+CV.BAL.dic$var.barplot
 
 ```
 
@@ -153,11 +153,11 @@ The color represents if the variables have been included in the numerator (*red*
 
 &nbsp;
 
-* __[[3]]__: the third element includes a graphical representation of the _Global balance_; the balance obtained with the whole dataset.
+* __$global.plot__: the third element includes a graphical representation of the _Global balance_; the balance obtained with the whole dataset.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=7, fig.width=12}
 
-grid.draw(CV.BAL.dic[[3]])
+grid.draw(CV.BAL.dic$global.plot)
 
 ```
 
@@ -170,12 +170,12 @@ The apparent discrimination accuracy of this balance (AUC of 0.786, top-right of
 
 &nbsp;
 
-* __[[4]]__: the fourth element of the list is a table with the summary of the CV-procedure. Rows represent the
+* __$cv.tab__: the fourth element of the list is a table with the summary of the CV-procedure. Rows represent the
 variables included either in the _Global balance_ (second column) or the three most frequent balances in the CV process (last three columns).
 The first column provides the percentage of times each variable has appeared in CV and, the last row points the proportion of times the most repeated balances have appeared.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-plot.tab(CV.BAL.dic[[4]])
+plot.tab(CV.BAL.dic$cv.tab)
 
 ```
 
@@ -183,35 +183,35 @@ The _Global balance_ is the one most frequently selected in the CV (44%), so it 
 
 &nbsp;
 
-* __[[5]]__: The fifth element in the output list is a vector with the test prediction or classification accuracy (AUC in this case) for each cv iteration (length equal to `n.fold*n.iter`). 
+* __$cv.accuracy__: The fifth element in the output list is a vector with the test prediction or classification accuracy (AUC in this case) for each cv iteration (length equal to `n.fold*n.iter`). 
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-CV.BAL.dic[[5]]; summary(CV.BAL.dic[[5]])
+CV.BAL.dic$cv.accuracy; summary(CV.BAL.dic$cv.accuracy)
 ```
 
 The mean of these values provides the cross-validation accuracy. In this case, the cross-validation AUC is 0.674, which, as expected, is lower than the appparent AUC value measured on the whole dataset (0.786). 
 
 &nbsp;
 
-* __[[6]]__: the sixth element of the output is a `data.frame` with the variables included in the _Global Balance_.
+* __$global.balance__: the sixth element of the output is a `data.frame` with the variables included in the _Global Balance_.
 The first column, `Taxa`, provides the names of the selected taxa while variable `Group` specifies wether the taxon is included in the numerator (NUM) or the denominator (DEN) of the balance.
 
 This table is useful in order to compute the balance score for another different dataset through `bal.value` function. For example, given this table (`tab`) and a matrix corresponding of microbiome information for other samples (`mat`, log-transformed count matrix including at least all the variables presented in `tab`), we can run `bal.value(bal.tab = tab, x = mat)` and we will obtain for each sample a value corresponding to the balance defined in `tab`.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-CV.BAL.dic[[6]]
+CV.BAL.dic$global.balance
 ```
 
-* __[[7]]__: the seventh element of the list is the result of a regression model. Balance selection is implemented through a regression model where the balance itself and additional covariates are the explanatory variables, and the variable of interest the response. The user has access to the regression model in order to obtain and analyze any of its characteristics.
+* __$glm__: the seventh element of the list is the result of a regression model. Balance selection is implemented through a regression model where the balance itself and additional covariates are the explanatory variables, and the variable of interest the response. The user has access to the regression model in order to obtain and analyze any of its characteristics.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-CV.BAL.dic[[7]]
+CV.BAL.dic$glm
 ```
 
-* __[[8]]__: the last element represents the optinal number of variables considered in the balance as the optimal.
+* __$opt.nvar__: the last element represents the optinal number of variables considered in the balance as the optimal.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-CV.BAL.dic[[8]]
+CV.BAL.dic$opt.nvar
 ```
 
 
@@ -253,7 +253,7 @@ have that:
 
 &nbsp;
 
-* __[[1]]__: even though the minimum mean MSE is obtained for eight variables, 
+* __$accuracy.nvar__: even though the minimum mean MSE is obtained for eight variables, 
 the lowest value under its mean plus the SE is four; so four is the optimal
 number of variables for this dataset.
 
@@ -261,13 +261,13 @@ number of variables for this dataset.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.sCD14[[1]]
+BAL.sCD14$accruacy.nvar
 
 ```
 
 &nbsp;
 
-* __[[2]]__: *f_Lachinospiraceae_g_unclassified* is the genus appearing most times 
+* __$var.barplot__: *f_Lachinospiraceae_g_unclassified* is the genus appearing most times 
 in the cross - validation procedure. There are also three additional genera with
 a presence above fifty percent.
 
@@ -276,14 +276,14 @@ a presence above fifty percent.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.sCD14[[2]]
+BAL.sCD14$var.barplot
 
 ```
 
 
 &nbsp;
 
-* __[[3]]__: the four genera defining the balance are divided into:
+* __$global.plot__: the four genera defining the balance are divided into:
 
   $X_+$ = { g\_Subdoligranulum, f\_Lachnospiraceae\_g\_Incertae\_Sedis}
 
@@ -295,48 +295,48 @@ higher scores for this balance are linked with higher values of sCD14.
 An R-squared value of 0.281 is obtained for the regression model.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=7, fig.width=12}
-grid.draw(BAL.sCD14[[3]])
+grid.draw(BAL.sCD14$global.plot)
 
 ```
 
 &nbsp;
 
-* __[[4]]__: the table indicates that the _Global Balance_ appears a 34% of times
+* __$cv.tab__: the table indicates that the _Global Balance_ appears a 34% of times
 in the CV-procedure being the most presented one. The second and the third balances 
 are also defined by three out of four of the variables included in the _Global Balance_,
 which reveals robustness for the proposal.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-plot.tab(BAL.sCD14[[4]])
+plot.tab(BAL.sCD14$cv.tab)
 
 ```
 
 &nbsp;
 
-* __[[5]]__: the MSE values for cross - validation procedure are highly variable.
+* __$cv.accuracy__: the MSE values for cross - validation procedure are highly variable.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-BAL.sCD14[[5]]; summary(BAL.sCD14[[5]])
+BAL.sCD14$cv.accuracy; summary(BAL.sCD14$cv.accuracy)
 ```
 
 &nbsp;
 
-* __[[6]]__: the sixth element of the output is the `data.frame` with the four variables selected in the balance.
+* __$global.balance__: the sixth element of the output is the `data.frame` with the four variables selected in the balance.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-BAL.sCD14[[6]]
+BAL.sCD14$global.balance
 ```
 
-* __[[7]]__: it shows the result of the regression model defined for the balance selection.
+* __$glm__: it shows the result of the regression model defined for the balance selection.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-BAL.sCD14[[7]]
+BAL.sCD14$glm
 ```
 
-* __[[8]]__: the last element indicates the optimal number of variables in the balance: four in this case.
+* __$opt.nvar__: the last element indicates the optimal number of variables in the balance: four in this case.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
-BAL.sCD14[[8]]
+BAL.sCD14$opt.nvar
 ```
 
 
@@ -374,25 +374,25 @@ The results for this data set reveal:
 
 &nbsp;
     
-* __[[1]]__: the number of taxa with the minimum mean MSE value is fourteen. Nevertheless, under its MSE + SE value, twelve is the number of taxa presenting the least MSE, so the considered balance will have twelve microbial taxa.
+* __$accuracy.nvar__: the number of taxa with the minimum mean MSE value is fourteen. Nevertheless, under its MSE + SE value, twelve is the number of taxa presenting the least MSE, so the considered balance will have twelve microbial taxa.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.Crohn[[1]]
+BAL.Crohn$accuracy.nvar
 
 ```
 
-* __[[2]]__: the barplot of the most selected taxa in the cross - validation
+* __$var.barplot__: the barplot of the most selected taxa in the cross - validation
 shows a core of twelve genera appearing at least in 70% of the cv balances. As
 it is going to be shown later, they are the taxa defining the _Global Balance_.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.Crohn[[2]]
+BAL.Crohn$var.barplot
 
 ```
 
-* __[[3]]__: the _Global Balance_ plot shows the twelve
+* __$global.plot__: the _Global Balance_ plot shows the twelve
 taxa whose balance most discriminates between cases and controls. Both, the boxplot and the 
 density curve reveal that cases with Crohn's disease have lower balance scores than controls,
 meaning lower relative abundances of those taxa in the numerator with respect to 
@@ -402,11 +402,11 @@ The discrimination value (AUC-ROC = 0.838) is very good as well as the cross - v
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=7, fig.width=12}
 
-grid.draw(BAL.Crohn[[3]])
+grid.draw(BAL.Crohn$global.plot)
 
 ```
 
-* __[[4]]__: the most repeated balance in the cross - validation is the 
+* __$cv.tab__: the most repeated balance in the cross - validation is the 
 _Global Balance_. This fact together with the core of taxa appearing in the 
 three most repeated balances, reveal a robust structure linked with Crohn's disease in this
 data set.
@@ -414,40 +414,40 @@ data set.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-plot.tab(BAL.Crohn[[4]])
+plot.tab(BAL.Crohn$cv.tab)
 
 ```
 
-* __[[5]]__: the mean AUC for the test datasets is very close to the AUC for the
+* __$cv.accuracy__: the mean AUC for the test datasets is very close to the AUC for the
 global balance; so , this is another fact that emphasized the robustness of the proposed balance.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.Crohn[[5]] ; summary(BAL.Crohn[[5]])
+BAL.Crohn$cv.accuracy ; summary(BAL.Crohn$cv.accuracy)
 
 ```
 
-* __[[6]]__: the sixth element of the output is a data.frame with the selected taxa. 
+* __$global.balance__: the sixth element of the output is a data.frame with the selected taxa. 
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.Crohn[[6]]
+BAL.Crohn$global.balance
 
 ```
 
-* __[[7]]__: the seventh element corresponds to the regression model where the balance and the covariates are the explanatory variables modelling the factor `CD` or `no`.
+* __$glm__: the seventh element corresponds to the regression model where the balance and the covariates are the explanatory variables modelling the factor `CD` or `no`.
 
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.Crohn[[7]]
+BAL.Crohn$glm
 
 ```
 
-* __[[8]]__: the last element indicates that in this case, twelve taxa define the proposed balance.
+* __$opt.nvar__: the last element indicates that in this case, twelve taxa define the proposed balance.
 
 ```{r, warning=FALSE, echo=T, message=F, fig.align="center",fig.height=6, fig.width=8}
 
-BAL.Crohn[[8]]
+BAL.Crohn$opt.nvar
 
 ```
