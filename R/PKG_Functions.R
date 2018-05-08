@@ -103,6 +103,8 @@
       # A vector with the rank of the name (initially rank value)
         rk <- rep(rank, length(Nam))
 
+      # If there is something to replace
+         if (length(Rep.Idx)!=0){
       # While r>1 (while there are repeated names)
         while (r>1){
         # Repeated names
@@ -125,6 +127,7 @@
         i<-i+1
 
       }
+     }
 
     # Load library
       library(qdapRegex)
