@@ -103,8 +103,7 @@
       # A vector with the rank of the name (initially rank value)
         rk <- rep(rank, length(Nam))
 
-      # If there is something to replace
-         if (length(Rep.Idx)!=0){
+
       # While r>1 (while there are repeated names)
         while (r>1){
         # Repeated names
@@ -113,7 +112,8 @@
           Rep.Idx<-which(Nam %in% Rep.Nam)
         # Modify rk
           rk[Rep.Idx]<- rk[Rep.Idx] - 1
-        # Modify Nam for Rep.Idx
+        # Modify Nam for Rep.Idx if it is not null
+          if (length(Rep.Idx)!=0){
           if(db=="SILVA"){
             Nam[Rep.Idx] <- paste(Ranking[rank-i],phy@tax_table[Rep.Idx,rank-i],
                                   Nam2[Rep.Idx],sep="_")
@@ -121,13 +121,13 @@
             Nam[Rep.Idx] <- paste(phy@tax_table[Rep.Idx,rank-i],
                                   Nam2[Rep.Idx],sep="_")
         }
-
+        }
       # Modify r as the number of the maximum repeated name
         r<-max(table(Nam))
         i<-i+1
 
       }
-     }
+ 
 
     # Load library
       library(qdapRegex)
