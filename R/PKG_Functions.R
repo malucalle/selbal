@@ -2119,8 +2119,8 @@
 #'   y <- HIV[,62]
 #' # Run the algorithm
 #'   Bal <- selbal.aux(x,y)
-#' # Balance values for the individuals
-#'   bal.value(Bal,x)
+#' # Balance values for the individuals (log-transformed x values with the corresponding zero-replacement)
+#'   bal.value(Bal,log(cmultrepl2(x)))
 #'
 #' @export bal.value
 
