@@ -13,7 +13,12 @@ the following instructions:
 
 ```
 # Installing the files in the repository
-  devtools::install_github(repo = "UVic-omics/selbal")
+  # Option 1 (non - Windows users)
+    devtools::install_github(repo = "UVic-omics/selbal")
+  # Option 2 (for Windows users)
+    install_url(url="https://github.com/UVic-omics/selbal/archive/master.zip", 
+                INSTALL_opt= "--no-multiarch")
+    
 # Loading the library
   library("selbal")
 ```
