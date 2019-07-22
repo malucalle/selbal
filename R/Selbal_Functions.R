@@ -1,433 +1,3 @@
-#------------------------------------------------------------------------------#
-#                           AUXILIARY FUNCTIONS
-#------------------------------------------------------------------------------#
-
-#------------------------------------------------------------------------------#
-# NAME: rename_OTU
-# FUNCTION: it renames the rows of an phyloseq object not to have repeated
-#           names. The idea is to write at genus level for example,
-#                       f_Lactobacillales_g_unclassified
-
-# INPUT:    a "phyloseq" object with @tax_table information and the rank
-#           given as a number of the column of @tax_table.
-# OUTPUT:   the "taxonomyTable" object with non-repeated modified names.
-#------------------------------------------------------------------------------#
-
-
-#' Rename each taxon
-#'
-#' \code{rename_OTU} assigns a non - repeated name to each bacteria for a given
-#'  taxonomic level.
-#'
-#'
-#' @param phy the phyloseq object where the information is contained.
-#' @param rank a \code{numeric} value indicating the taxonomic level where the
-#' names should be taken. It corresponds with the column number of
-#' \code{phy@tax_table} associated to the desired taxonomic rank.
-#' @param db the bacterial database used to name each OTU of the phyloseq
-#' object: SILVA (\emph{default}) or GreenGenes.
-#'
-#'
-#'
-#' @return A vector with the names for each bacteria. It has not repeated names
-#' and none of them starts with \emph{Incertae_Sedis} or \emph{unclassified}.
-#'
-#' @export rename_OTU
-
-
-  rename_OTU <- function(phy,rank, db ="SILVA"){
-
-  # Test if the objects are from the expected class
-    stopifnot(class(phy) == "phyloseq")
-    stopifnot(class(rank) == "numeric")
-  # Rank abbreviation (Kingdom, Phylum, Class, Order, Family, Genus, Specie)
-    Ranking<-c("k","p","c","o","f","g","s")
-
-
-  ################################################################################
-  # AUXILIAR FUNCTION
-  ################################################################################
-
-    replace_rare <- function(j, rk, tax_table, Nam, Ranking, db){
-
-    # The column of tax_table we are working on
-      u <- rk[j]
-    # The first previous column which is not "unclassified"
-      # If the name is unclassified . . .
-        if (tax_table[j,u]=="unclassified"){
-          while(tax_table[j,u] %in% c("unclassified", "Incertae_Sedis")){
-            u <- u - 1}
-        # Modify Nam
-          if (db=="SILVA"){
-            V<-paste(Ranking[u], tax_table[j,u],
-                     paste(unlist(strsplit(Nam[j],split="_"))[-c(1:2)],
-                           collapse = "_"),
-                     sep="_")
-          } else {
-            v<-paste(tax_table[j,u],
-                     paste(unlist(strsplit(Nam[j],split="_"))[-c(1:2)],
-                           collapse = "_"),
-                     sep="_")}
-
-      # . . . else if the name is Incertae_Sedis
-        } else if (tax_table[j,u]=="Incertae_Sedis"){
-          while(tax_table[j,u] %in% c("unclassified", "Incertae_Sedis")){
-          u <- u - 1}
-          if (db=="SILVA"){
-            # Modify Nam
-              V<-paste(Ranking[u], tax_table[j,u],
-                     paste(unlist(strsplit(Nam[j],split="_")), collapse = "_"),
-                     sep="_")
-          } else {
-            V<-paste(tax_table[j,u],
-                     paste(unlist(strsplit(Nam[j],split="_")), collapse = "_"),
-                     sep="_")
-          }
-        }
-
-      # Return V
-        return(V)
-      }
-
-  ################################################################################
-
-    # Vector with initial names
-      Nam<-phy@tax_table[,rank]
-      if (db=="SILVA"){Nam <- paste(Ranking[rank],Nam,sep="_")}
-      # Make a copy to work with (Nam2)
-        Nam2<-Nam
-      # Initial r value (counting the maximum repeated values for a certain name)
-        r<-2
-      # Initial value for the number of categories used
-        i<-1
-      # A vector with the rank of the name (initially rank value)
-        rk <- rep(rank, length(Nam))
-
-
-      # While r>1 (while there are repeated names)
-        while (r>1){
-        # Repeated names
-          Rep.Nam<-names(table(Nam)[(table(Nam)>1)])
-        # Indices with repeated names
-          Rep.Idx<-which(Nam %in% Rep.Nam)
-        # Modify rk
-          rk[Rep.Idx]<- rk[Rep.Idx] - 1
-        # Modify Nam for Rep.Idx if it is not null
-          if (length(Rep.Idx)!=0){
-          if(db=="SILVA"){
-            Nam[Rep.Idx] <- paste(Ranking[rank-i],phy@tax_table[Rep.Idx,rank-i],
-                                  Nam2[Rep.Idx],sep="_")
-          }else{
-            Nam[Rep.Idx] <- paste(phy@tax_table[Rep.Idx,rank-i],
-                                  Nam2[Rep.Idx],sep="_")
-        }
-        }
-      # Modify r as the number of the maximum repeated name
-        r<-max(table(Nam))
-        i<-i+1
-
-      }
- 
-
-    # Load library
-      library(qdapRegex)
-    # Extract the first value for each name
-      First.NAM <- unlist(lapply(Nam, function(x)
-        unlist(rm_between(x, "_","_", extract = T))[1]))
-    # Indices for the names to replace (with the first name as unclassified
-    # or Incertae_Sedis)
-      IDX.Rep <- which(First.NAM %in% c("unclassified", "Incertae"))
-    # If there are unclassified, . . .
-      if (length(IDX.Rep) !=0){
-        for (i in 1:length(IDX.Rep)){
-          Nam[IDX.Rep[i]] <-  replace_rare(IDX.Rep[i],
-                                           rk,
-                                           phy@tax_table,
-                                           Nam,
-                                           Ranking,
-                                           db)
-        }
-
-      }
-
-      return(Nam)
-  }
-
-################################################################################
-
-#------------------------------------------------------------------------------#
-# Auxiliar function in order to replace zeros if necesary
-#------------------------------------------------------------------------------#
-
-#' Zero replacement for compositional data
-#'
-#' \code{cmultRepl2} replaces the zeros for a matrix where each row is
-#' compositional
-#'
-#'
-#' @param x a \code{matrix} object with the information of variables
-#' (\emph{columns}) for each sample (\emph{rows}).
-#' @param zero.rep if \emph{"bayes"} the Bayesian - Multiplicative treatment
-#' implemented in \code{zCompositions} is applied. If \emph{"one"}, a
-#' pseudocount of 1 is added to the whole matrix.
-#'
-#'
-#'
-#' @return The initial matrix after the zero - replacement normalized so that
-#' each sample's composition sums one.
-#'
-#'
-#' @examples
-#'
-#' # Load the count matrix (with zeros)
-#'   x <- HIV[,1:60]
-#' # Zero replacement
-#'   x.non0 <- cmultRepl2(x, zero.rep = "bayes")
-#'
-#'
-#' @export cmultRepl2
-
-
-
-  cmultRepl2 <- function(x, zero.rep = "bayes"){
-
-    # Load library
-      library(zCompositions)
-    # If there are zeros, use cmultRepl
-      if(sum(x==0)!=0){
-        if (zero.rep =="bayes"){
-          new.x <- cmultRepl(x, suppress.print = T)
-        } else if (zero.rep =="one"){
-          new.x <- x + 1
-        }
-      }else { new.x <- x}
-    # Return new.x
-      return(new.x)
-  }
-
-#------------------------------------------------------------------------------#
-
-
-#------------------------------------------------------------------------------#
-# NAME: plot.tab
-# INPUT:
-#     dat: the table to represent
-#     col: vector with two colors, each of them referring to the variables
-#          appearing in the numerator and in the denominator respectively.
-# OUTPUT: a plot with the information given in dat (for the first five columns)
-#------------------------------------------------------------------------------#
-
-
-#' Plots the cross - validated summary table
-#'
-#'
-#'
-#' @param dat the \code{data.frame} object to draw obtained from
-#'  \code{selbal.cv} function.
-#' @param col vector with two colors, each of them referring to the variables
-#' appearing in the numerator and in the denominator, respectively.
-#'
-#'
-#' @return A colored table with the information of the given \code{data.frame}:
-#'
-#' \itemize{
-#'  \item The first column of the table (%) represents the proportion of times
-#'  a variables has been selected for a balance.
-#'
-#'  \item The second column (\emph{Global}) shows the result for the balance
-#'  obtained using all the available samples.
-#'
-#'  \item The last three columns represent the most repeated balances in the
-#'  cross - validation procedure.
-#'
-#'  }
-#'
-#' @examples
-#' #---------------------------------------------------#
-#' # 1) Compute a cross - validated balance selection
-#' #---------------------------------------------------#
-#'  # Load data set
-#'    load("HIV.rda")
-#'   # Define x and y
-#'     x <- HIV[,1:60]
-#'     y <- HIV[,62]
-#'  # Run the algorithm
-#'     CV.Bal <- selbal.cv(x,y)
-#'
-#' #----------------------------------------#
-#' # 2) Plot the table
-#' #----------------------------------------#
-#'
-#'   plot.tab(CV.Bal[[4]])
-#'
-#' @export plot.tab
-
-
-  plot.tab <- function(dat, col = c("steelblue1","tomato1")){
-    # Load library
-      library(gtable)
-    # Data.frame dimension
-      dim.dat<-dim(dat)
-    # Colnames dat
-      colnames(dat)<- c("%","Global",paste("BAL", 1:(dim.dat[2]-2), sep=" "))
-    # Modify dat
-      dat.l<-data.frame(cbind(c(" ",row.names(dat)),rbind(colnames(dat),dat)))
-      row.names(dat.l)<-colnames(dat.l)<-NULL
-
-    # Build my.data2 with the row.names(my.data) as a first column
-      dat2<-dat.l
-      dat2<-apply(dat2,2,function(x) as.character(x))
-    # Extract some information
-      nc <- ncol(dat2)
-      nr <- nrow(dat2)
-      n <- nc*nr
-    # Change the values for the background colour
-    # Legend (NUM = 10, DEN = 9, OTHER <- 0, HEADER/ROW.NAME <- 1)
-      dat2[dat2=="NUM"] <- 10
-      dat2[dat2=="DEN"] <- 9
-      dat2[,1]<-dat2[1,] <- 1
-      dat2[-1,2]<- 0
-      dat2[nr,]<- 0
-
-    # Information but the last linefor colors
-      Letra <- as.character(factor(dat2, labels=c("black", "gray15", col[2],
-                                                  col[1])))
-
-    # Delete words from dat, only selecting the numbers
-      dat1<-dat.l
-      dat1[-c(1,nrow(dat1)),-c(1,2)]<-" "
-      dat1[is.na(dat1)]<-" "
-
-    # Filling colors
-      fill <- as.character(factor(t(dat2),labels=c("white", "gray85", col[2],
-                                                   col[1])))
-    # Define the background of cells
-      fill <- lapply(seq_len(n), function(ii) rectGrob(gp=gpar(fill=fill[ii])))
-
-    # Some calculations for cell sizes
-      row_heights <- function(m){
-        do.call(unit.c, apply(m, 1, function(l)
-          max(do.call(unit.c, lapply(l, grobHeight)))))
-      }
-
-      col_widths <- function(m){
-        do.call(unit.c, apply(m, 2, function(l)
-          max(do.call(unit.c, lapply(l, grobWidth)))))
-      }
-
-    # Object as matrix
-      label_matrix <- as.matrix(dat1)
-
-      nc <- ncol(label_matrix)
-      nr <- nrow(label_matrix)
-      n <- nc*nr
-
-    # Text written in the table
-    # Auxiliar values for text justification
-      pos <- rep(c(0.5, rep(0.96,nr-2),0.5),nc)
-      jus <- rep(c(0.5, rep(1,nr-2),0.5),nc)
-    # Third column centered
-      pos[(nr +1):(2*nr)] <- jus[(nr+1):(2*nr)] <- 0.5
-
-    # Define the text characteristics
-      labels <- lapply(seq_len(n), function(ii)
-        textGrob(label_matrix[ii],x=pos[ii],
-                 just=jus[ii],
-                 gp=gpar(fontface="bold",col=Letra[ii])))
-      label_grobs <- matrix(labels, ncol=nc)
-
-    # Place labels in a gtable
-      g <- gtable_matrix("table", grobs=label_grobs,
-                         widths=col_widths(label_grobs) + unit(8,"mm"),
-                         heights=row_heights(label_grobs) + unit(5,"mm"))
-
-    # Add the background
-      g <- gtable_add_grob(g, fill, t=rep(seq_len(nr), each=nc),
-                           l=rep(seq_len(nc), nr), z=0, name="fill")
-    # Graphical representation
-      grid.draw(g)
-
-    }
-
-#------------------------------------------------------------------------------#
-
-
-
-
-################################################################################
-# FUNCTION: logit.cor
-################################################################################
-
-#' Computes an association value  between a dichotomous variable and a
-#' continuous one.
-#'
-#'
-#'
-#' @param FIT a \code{glm} object referred to the logistic regression of a
-#' dichotomous variable.
-#' @param y the response variable (dichotomous).
-#' @param logit.acc when \code{y} is dichotomous, the measure to compute for
-#' the correlation between \code{y} and the proposed \emph{balance}
-#' adjusting for covariates. One of the following values: \code{"Rsq"} (default),
-#'  \code{"AUC"} or \code{"Tjur"}.
-#'
-#'
-#' @return The association value using the selected method \code{logit.acc}.
-#'
-#'
-#' @export logit.cor
-
-# Define the function logit.cor
-  logit.cor <- function(FIT, y, logit.acc){
-    if (logit.acc == "AUC"){
-      d <- as.numeric(auc(y, FIT$fitted.values))
-    } else if (logit.acc == "Rsq"){
-      d <- cor(y, FIT$fitted.values)^2
-    } else if (logit.acc == "Tjur"){
-      d <- mean(FIT$fitted.values[y==1]) - mean(FIT$fitted.values[y==0])
-    }
-
-    # Return the value
-    return(d)
-  }
-
-#------------------------------------------------------------------------------#
-
-
-################################################################################
-# FUNCTION: rowM
-################################################################################
-
-#' Calculates the mean of each row of a matrix (though having only one column).
-#'
-#'
-#'
-#' @param x a \code{matrix} object.
-#'
-#' @return A \code{vector} with the mean of each row of \code{x}, even if the
-#' matrix only contains one column.
-#'
-#' @examples
-#' # Build a matrix with one column
-#'   M <- matrix(rnorm(10), nrow=1)
-#' # rowM (resulting on the same matrix M)
-#'   rowM(M)
-#'
-#' # Build a matrix
-#'   M <- matrix (runif(100), nrow=10)
-#' # Apply rowM function
-#'   rowM(M)
-#'
-#' @export rowM
-
-# Define the function rowM
-  rowM <- function(x){
-    if(is.vector(x)) {u <- x
-    } else { u <- rowMeans(x)}
-    return(u)
-  }
-
-#------------------------------------------------------------------------------#
 
 ################################################################################
 # FUNCTION: selbal
@@ -446,8 +16,8 @@
 #' (\emph{columns}).
 #' @param logit.acc when \code{y} is dichotomous, the measure to compute for
 #' the correlation between \code{y} and the proposed \emph{balance}
-#' adjusting for covariates. One of the following values: \code{"Rsq"} (default),
-#'  \code{"AUC"} or \code{"Tjur"}.
+#' adjusting for covariates. One of the following values: \code{"AUC"} (default),
+#'  \code{"Dev"}, \code{"Rsq"} or \code{"Tjur"}.
 #' @param logt \code{logical} value determining if \code{x} needs a
 #' log-transformation. TRUE if \code{x} contains raw counts or proportions.
 #' @param tab \code{logical} value. It specifies if a table with the variables
@@ -533,6 +103,7 @@
         ylev <- levels(y)
         numy <- as.numeric(y) - 1
         f.class <- "binomial"
+        nulldev0<<-glm(y~1, family=binomial())[[10]]
       }
 
     #------------------------------------------------------------------#
@@ -1079,8 +650,8 @@
 #' CV - balance or in both of them.
 #' @param logit.acc when \code{y} is dichotomous, the measure to compute for
 #' the correlation between \code{y} and the proposed \emph{balance}
-#' adjusting for covariates. One of the following values: \code{"Rsq"} (default),
-#'  \code{"AUC"} or \code{"Tjur"}.
+#' adjusting for covariates. One of the following values: \code{"AUC"} (default),
+#'  \code{"Dev"}, \code{"Rsq"} or \code{"Tjur"}.
 #' @param maxV \code{numeric} value defining the maximum number of variables
 #' composing the balance. Default 1e10 to give prevalence to \code{th.imp}
 #' parameter.
@@ -1137,7 +708,7 @@
                         covar = NULL, col = c("steelblue1", "tomato1"),
                         col2 = c("darkgreen", "steelblue4","tan1"),
                         logit.acc = "AUC", maxV = 20, zero.rep = "bayes",
-                        opt.cri = "1se"){
+                        opt.cri = "1se", user_numVar = NULL){
 
     # Load package plyr
     suppressMessages(library(plyr))
@@ -1300,7 +871,10 @@
                 ACC <- apply(pred, 2, function(x) cor (y, x)^2)
             } else if (logit.acc == "Tjur"){
                 ACC <- apply(pred, 2, function(x) mean(x[y==1]) - mean(x[y==0]))
-            }
+            } else if (logit.acc == "Dev"){
+				ACC<-apply(pred, 2, function(x) 1-(deviance(glm(y ~ x, data= df, family = binomial()))/glm(y~1, family=binomial())[[10]]) )  # proportion of explained deviance
+			}
+
           }
 
         return(ACC)
@@ -1391,7 +965,10 @@
 
   # Print a message indicating the number of optimal variables
     cat(paste("\n\n The optimal number of variables is:", opt.M, "\n\n"))
-
+    
+	if (!is.null(user_numVar)){
+		opt.M <- user_numVar;
+	} 
 
 
     # Define NUM and DEN according to opt.M
@@ -1447,6 +1024,10 @@
 
     }else{
       df.boxplot <- data.frame(mean = ACC.mean, se = ACC.se, n =2:maxV)
+	  ylabelName="Accuracy (AUC)";
+	  if (logit.acc=="Dev"){
+		ylabelName="Explained Deviance";
+	  }
       # Load library
       library(ggplot2)
       # The plot
@@ -1458,7 +1039,7 @@
         geom_point(color = "red", lwd=2) +
         theme_bw() +
         xlab("Number of variables") +
-        ylab("Accuracy (AUC)") +
+        ylab(ylabelName) +
         scale_x_continuous(breaks=seq(2,maxV,1)) +
         theme(strip.text.x = element_text(size=12, angle=0,
                                           face="bold",colour="white"),
@@ -2362,3 +1943,436 @@
 
 #------------------------------------------------------------------------------#
 
+  #------------------------------------------------------------------------------#
+  #                           AUXILIARY FUNCTIONS
+  #------------------------------------------------------------------------------#
+  
+  #------------------------------------------------------------------------------#
+  # NAME: rename_OTU
+  # FUNCTION: it renames the rows of an phyloseq object not to have repeated
+  #           names. The idea is to write at genus level for example,
+  #                       f_Lactobacillales_g_unclassified
+  
+  # INPUT:    a "phyloseq" object with @tax_table information and the rank
+  #           given as a number of the column of @tax_table.
+  # OUTPUT:   the "taxonomyTable" object with non-repeated modified names.
+  #------------------------------------------------------------------------------#
+  
+  
+  #' Rename each taxon
+  #'
+  #' \code{rename_OTU} assigns a non - repeated name to each bacteria for a given
+  #'  taxonomic level.
+  #'
+  #'
+  #' @param phy the phyloseq object where the information is contained.
+  #' @param rank a \code{numeric} value indicating the taxonomic level where the
+  #' names should be taken. It corresponds with the column number of
+  #' \code{phy@tax_table} associated to the desired taxonomic rank.
+  #' @param db the bacterial database used to name each OTU of the phyloseq
+  #' object: SILVA (\emph{default}) or GreenGenes.
+  #'
+  #'
+  #'
+  #' @return A vector with the names for each bacteria. It has not repeated names
+  #' and none of them starts with \emph{Incertae_Sedis} or \emph{unclassified}.
+  #'
+  #' @export rename_OTU
+  
+  
+  rename_OTU <- function(phy,rank, db ="SILVA"){
+    
+    # Test if the objects are from the expected class
+    stopifnot(class(phy) == "phyloseq")
+    stopifnot(class(rank) == "numeric")
+    # Rank abbreviation (Kingdom, Phylum, Class, Order, Family, Genus, Specie)
+    Ranking<-c("k","p","c","o","f","g","s")
+    
+    
+    ################################################################################
+    # AUXILIAR FUNCTION
+    ################################################################################
+    
+    replace_rare <- function(j, rk, tax_table, Nam, Ranking, db){
+      
+      # The column of tax_table we are working on
+      u <- rk[j]
+      # The first previous column which is not "unclassified"
+      # If the name is unclassified . . .
+      if (tax_table[j,u]=="unclassified"){
+        while(tax_table[j,u] %in% c("unclassified", "Incertae_Sedis")){
+          u <- u - 1}
+        # Modify Nam
+        if (db=="SILVA"){
+          V<-paste(Ranking[u], tax_table[j,u],
+                   paste(unlist(strsplit(Nam[j],split="_"))[-c(1:2)],
+                         collapse = "_"),
+                   sep="_")
+        } else {
+          v<-paste(tax_table[j,u],
+                   paste(unlist(strsplit(Nam[j],split="_"))[-c(1:2)],
+                         collapse = "_"),
+                   sep="_")}
+        
+        # . . . else if the name is Incertae_Sedis
+      } else if (tax_table[j,u]=="Incertae_Sedis"){
+        while(tax_table[j,u] %in% c("unclassified", "Incertae_Sedis")){
+          u <- u - 1}
+        if (db=="SILVA"){
+          # Modify Nam
+          V<-paste(Ranking[u], tax_table[j,u],
+                   paste(unlist(strsplit(Nam[j],split="_")), collapse = "_"),
+                   sep="_")
+        } else {
+          V<-paste(tax_table[j,u],
+                   paste(unlist(strsplit(Nam[j],split="_")), collapse = "_"),
+                   sep="_")
+        }
+      }
+      
+      # Return V
+      return(V)
+    }
+    
+    ################################################################################
+    
+    # Vector with initial names
+    Nam<-phy@tax_table[,rank]
+    if (db=="SILVA"){Nam <- paste(Ranking[rank],Nam,sep="_")}
+    # Make a copy to work with (Nam2)
+    Nam2<-Nam
+    # Initial r value (counting the maximum repeated values for a certain name)
+    r<-2
+    # Initial value for the number of categories used
+    i<-1
+    # A vector with the rank of the name (initially rank value)
+    rk <- rep(rank, length(Nam))
+    
+    
+    # While r>1 (while there are repeated names)
+    while (r>1){
+      # Repeated names
+      Rep.Nam<-names(table(Nam)[(table(Nam)>1)])
+      # Indices with repeated names
+      Rep.Idx<-which(Nam %in% Rep.Nam)
+      # Modify rk
+      rk[Rep.Idx]<- rk[Rep.Idx] - 1
+      # Modify Nam for Rep.Idx if it is not null
+      if (length(Rep.Idx)!=0){
+        if(db=="SILVA"){
+          Nam[Rep.Idx] <- paste(Ranking[rank-i],phy@tax_table[Rep.Idx,rank-i],
+                                Nam2[Rep.Idx],sep="_")
+        }else{
+          Nam[Rep.Idx] <- paste(phy@tax_table[Rep.Idx,rank-i],
+                                Nam2[Rep.Idx],sep="_")
+        }
+      }
+      # Modify r as the number of the maximum repeated name
+      r<-max(table(Nam))
+      i<-i+1
+      
+    }
+    
+    
+    # Load library
+    library(qdapRegex)
+    # Extract the first value for each name
+    First.NAM <- unlist(lapply(Nam, function(x)
+      unlist(rm_between(x, "_","_", extract = T))[1]))
+    # Indices for the names to replace (with the first name as unclassified
+    # or Incertae_Sedis)
+    IDX.Rep <- which(First.NAM %in% c("unclassified", "Incertae"))
+    # If there are unclassified, . . .
+    if (length(IDX.Rep) !=0){
+      for (i in 1:length(IDX.Rep)){
+        Nam[IDX.Rep[i]] <-  replace_rare(IDX.Rep[i],
+                                         rk,
+                                         phy@tax_table,
+                                         Nam,
+                                         Ranking,
+                                         db)
+      }
+      
+    }
+    
+    return(Nam)
+  }
+  
+  ################################################################################
+  
+  #------------------------------------------------------------------------------#
+  # Auxiliar function in order to replace zeros if necesary
+  #------------------------------------------------------------------------------#
+  
+  #' Zero replacement for compositional data
+  #'
+  #' \code{cmultRepl2} replaces the zeros for a matrix where each row is
+  #' compositional
+  #'
+  #'
+  #' @param x a \code{matrix} object with the information of variables
+  #' (\emph{columns}) for each sample (\emph{rows}).
+  #' @param zero.rep if \emph{"bayes"} the Bayesian - Multiplicative treatment
+  #' implemented in \code{zCompositions} is applied. If \emph{"one"}, a
+  #' pseudocount of 1 is added to the whole matrix.
+  #'
+  #'
+  #'
+  #' @return The initial matrix after the zero - replacement normalized so that
+  #' each sample's composition sums one.
+  #'
+  #'
+  #' @examples
+  #'
+  #' # Load the count matrix (with zeros)
+  #'   x <- HIV[,1:60]
+  #' # Zero replacement
+  #'   x.non0 <- cmultRepl2(x, zero.rep = "bayes")
+  #'
+  #'
+  #' @export cmultRepl2
+  
+  
+  
+  cmultRepl2 <- function(x, zero.rep = "bayes"){
+    
+    # Load library
+    library(zCompositions)
+    # If there are zeros, use cmultRepl
+    if(sum(x==0)!=0){
+      if (zero.rep =="bayes"){
+        new.x <- cmultRepl(x, suppress.print = T)
+      } else if (zero.rep =="one"){
+        new.x <- x + 1
+      }
+    }else { new.x <- x}
+    # Return new.x
+    return(new.x)
+  }
+  
+  #------------------------------------------------------------------------------#
+  
+  
+  #------------------------------------------------------------------------------#
+  # NAME: plot.tab
+  # INPUT:
+  #     dat: the table to represent
+  #     col: vector with two colors, each of them referring to the variables
+  #          appearing in the numerator and in the denominator respectively.
+  # OUTPUT: a plot with the information given in dat (for the first five columns)
+  #------------------------------------------------------------------------------#
+  
+  
+  #' Plots the cross - validated summary table
+  #'
+  #'
+  #'
+  #' @param dat the \code{data.frame} object to draw obtained from
+  #'  \code{selbal.cv} function.
+  #' @param col vector with two colors, each of them referring to the variables
+  #' appearing in the numerator and in the denominator, respectively.
+  #'
+  #'
+  #' @return A colored table with the information of the given \code{data.frame}:
+  #'
+  #' \itemize{
+  #'  \item The first column of the table (%) represents the proportion of times
+  #'  a variables has been selected for a balance.
+  #'
+  #'  \item The second column (\emph{Global}) shows the result for the balance
+  #'  obtained using all the available samples.
+  #'
+  #'  \item The last three columns represent the most repeated balances in the
+  #'  cross - validation procedure.
+  #'
+  #'  }
+  #'
+  #' @examples
+  #' #---------------------------------------------------#
+  #' # 1) Compute a cross - validated balance selection
+  #' #---------------------------------------------------#
+  #'  # Load data set
+  #'    load("HIV.rda")
+  #'   # Define x and y
+  #'     x <- HIV[,1:60]
+  #'     y <- HIV[,62]
+  #'  # Run the algorithm
+  #'     CV.Bal <- selbal.cv(x,y)
+  #'
+  #' #----------------------------------------#
+  #' # 2) Plot the table
+  #' #----------------------------------------#
+  #'
+  #'   plot.tab(CV.Bal[[4]])
+  #'
+  #' @export plot.tab
+  
+  
+  plot.tab <- function(dat, col = c("steelblue1","tomato1")){
+    # Load library
+    library(gtable)
+    # Data.frame dimension
+    dim.dat<-dim(dat)
+    # Colnames dat
+    colnames(dat)<- c("%","Global",paste("BAL", 1:(dim.dat[2]-2), sep=" "))
+    # Modify dat
+    dat.l<-data.frame(cbind(c(" ",row.names(dat)),rbind(colnames(dat),dat)))
+    row.names(dat.l)<-colnames(dat.l)<-NULL
+    
+    # Build my.data2 with the row.names(my.data) as a first column
+    dat2<-dat.l
+    dat2<-apply(dat2,2,function(x) as.character(x))
+    # Extract some information
+    nc <- ncol(dat2)
+    nr <- nrow(dat2)
+    n <- nc*nr
+    # Change the values for the background colour
+    # Legend (NUM = 10, DEN = 9, OTHER <- 0, HEADER/ROW.NAME <- 1)
+    dat2[dat2=="NUM"] <- 10
+    dat2[dat2=="DEN"] <- 9
+    dat2[,1]<-dat2[1,] <- 1
+    dat2[-1,2]<- 0
+    dat2[nr,]<- 0
+    
+    # Information but the last linefor colors
+    Letra <- as.character(factor(dat2, labels=c("black", "gray15", col[2],
+                                                col[1])))
+    
+    # Delete words from dat, only selecting the numbers
+    dat1<-dat.l
+    dat1[-c(1,nrow(dat1)),-c(1,2)]<-" "
+    dat1[is.na(dat1)]<-" "
+    
+    # Filling colors
+    fill <- as.character(factor(t(dat2),labels=c("white", "gray85", col[2],
+                                                 col[1])))
+    # Define the background of cells
+    fill <- lapply(seq_len(n), function(ii) rectGrob(gp=gpar(fill=fill[ii])))
+    
+    # Some calculations for cell sizes
+    row_heights <- function(m){
+      do.call(unit.c, apply(m, 1, function(l)
+        max(do.call(unit.c, lapply(l, grobHeight)))))
+    }
+    
+    col_widths <- function(m){
+      do.call(unit.c, apply(m, 2, function(l)
+        max(do.call(unit.c, lapply(l, grobWidth)))))
+    }
+    
+    # Object as matrix
+    label_matrix <- as.matrix(dat1)
+    
+    nc <- ncol(label_matrix)
+    nr <- nrow(label_matrix)
+    n <- nc*nr
+    
+    # Text written in the table
+    # Auxiliar values for text justification
+    pos <- rep(c(0.5, rep(0.96,nr-2),0.5),nc)
+    jus <- rep(c(0.5, rep(1,nr-2),0.5),nc)
+    # Third column centered
+    pos[(nr +1):(2*nr)] <- jus[(nr+1):(2*nr)] <- 0.5
+    
+    # Define the text characteristics
+    labels <- lapply(seq_len(n), function(ii)
+      textGrob(label_matrix[ii],x=pos[ii],
+               just=jus[ii],
+               gp=gpar(fontface="bold",col=Letra[ii])))
+    label_grobs <- matrix(labels, ncol=nc)
+    
+    # Place labels in a gtable
+    g <- gtable_matrix("table", grobs=label_grobs,
+                       widths=col_widths(label_grobs) + unit(8,"mm"),
+                       heights=row_heights(label_grobs) + unit(5,"mm"))
+    
+    # Add the background
+    g <- gtable_add_grob(g, fill, t=rep(seq_len(nr), each=nc),
+                         l=rep(seq_len(nc), nr), z=0, name="fill")
+    # Graphical representation
+    grid.draw(g)
+    
+  }
+  
+  #------------------------------------------------------------------------------#
+  
+  
+  
+  
+  ################################################################################
+  # FUNCTION: logit.cor
+  ################################################################################
+  
+  #' Computes an association value  between a dichotomous variable and a
+  #' continuous one.
+  #'
+  #'
+  #'
+  #' @param FIT a \code{glm} object referred to the logistic regression of a
+  #' dichotomous variable.
+  #' @param y the response variable (dichotomous).
+  #' @param logit.acc when \code{y} is dichotomous, the measure to compute for
+  #' the correlation between \code{y} and the proposed \emph{balance}
+  #' adjusting for covariates. One of the following values: \code{"Rsq"} (default),
+  #'  \code{"AUC"} or \code{"Tjur"}.
+  #'
+  #'
+  #' @return The association value using the selected method \code{logit.acc}.
+  #'
+  #'
+  #' @export logit.cor
+  
+  # Define the function logit.cor
+  logit.cor <- function(FIT, y, logit.acc){
+    if (logit.acc == "AUC"){
+      d <- as.numeric(auc(y, FIT$fitted.values))
+    } else if (logit.acc == "Rsq"){
+      d <- cor(y, FIT$fitted.values)^2
+    } else if (logit.acc == "Tjur"){
+      d <- mean(FIT$fitted.values[y==1]) - mean(FIT$fitted.values[y==0])
+    } else if (logit.acc == "Dev"){
+      d<-1-(deviance(FIT)/glm(y~1, family=binomial())[[10]])  # proportion of explained deviance
+    }
+    
+    # Return the value
+    return(d)
+  }
+  
+  #------------------------------------------------------------------------------#
+  
+  
+  ################################################################################
+  # FUNCTION: rowM
+  ################################################################################
+  
+  #' Calculates the mean of each row of a matrix (though having only one column).
+  #'
+  #'
+  #'
+  #' @param x a \code{matrix} object.
+  #'
+  #' @return A \code{vector} with the mean of each row of \code{x}, even if the
+  #' matrix only contains one column.
+  #'
+  #' @examples
+  #' # Build a matrix with one column
+  #'   M <- matrix(rnorm(10), nrow=1)
+  #' # rowM (resulting on the same matrix M)
+  #'   rowM(M)
+  #'
+  #' # Build a matrix
+  #'   M <- matrix (runif(100), nrow=10)
+  #' # Apply rowM function
+  #'   rowM(M)
+  #'
+  #' @export rowM
+  
+  # Define the function rowM
+  rowM <- function(x){
+    if(is.vector(x)) {u <- x
+    } else { u <- rowMeans(x)}
+    return(u)
+  }
+  
+  #------------------------------------------------------------------------------#
+  
