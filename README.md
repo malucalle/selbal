@@ -30,7 +30,7 @@ To start using `selbal` we recomend to:
 - Read the manuscript [https://msystems.asm.org/content/3/4/e00053-18]
 - Use the `help()` functions for getting a detailed instructions of their
   use.
-- Read the associated vignette (see vignette folder).
+- Read the associated vignette (see https://github.com/UVic-omics/selbal/tree/master/vignettes).
 
 
 
