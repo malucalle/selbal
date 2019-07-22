@@ -12,7 +12,6 @@
 
 <meta name="author" content="J. Rivera-Pinto, University of Vic and IrsiCaixa" />
 
-
 <title>Vignette for selbal package</title>
 
 
@@ -69,21 +68,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Vignette for selbal package</h1>
 <h4 class="author"><em>J. Rivera-Pinto, University of Vic and IrsiCaixa</em></h4>
+<h4 class="author"><em> updated (July 2019) by M.Calle (University of Vic), A. Susin (UPC-BarcelonaTech)</em></h4>
 
 
-
-<p>In this vignette we illustrate the use of <code>selbal</code>, an R package for selection of balances in microbiome compositional data. As described in Rivera-Pinto et al. 2018 <em>Balances: a new perspective for microbiome analysis</em> <a href="https://doi.org/10.1101/219386" class="uri">https://doi.org/10.1101/219386</a>, <code>selbal</code> implements a forward-selection method for the identification of two groups of taxa whose relative abundance, or balance, is associated with the response variable of interest.</p>
+<p>In this vignette we illustrate the use of <B>selbal</B> , an R package for selection of balances in microbiome compositional data. As described in Rivera-Pinto et al. 2018 <em>Balances: a new perspective for microbiome analysis</em> <a href="https://doi.org/10.1101/219386" class="uri">10.1128/mSystems.00053-18</a>, <B>selbal</B>  implements a forward-selection method for the identification of two groups of taxa whose relative abundance, or balance, is associated with the response variable of interest.</p>
 <p><br />
-# Installing and loading <code>selbal</code>   <code>selbal</code> package is available on GitHub and can be installed on your computer through the following instructions:</p>
+# Installing and loading <B>selbal</B>  </p>   
+<B>selbal</B>  package is available on GitHub and can be installed on your computer through the following instructions:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load &quot;devtools&quot; library (install it if needed)</span>
   <span class="kw">library</span>(devtools)
 
 <span class="co"># Install &quot;selbal&quot;&quot;</span>
   <span class="kw">install_github</span>(<span class="dt">repo =</span> <span class="st">&quot;UVic-omics/selbal&quot;</span>)
+ 
+  <span class="kw"> For windows users: </span>
+  <span class="kw"> install_url(url="https://github.com/UVic-omics/selbal/archive/master.zip", 
+                INSTALL_opt= "--no-multiarch") </span>
+  
   
 <span class="co"># Load library</span>
   <span class="kw">library</span>(selbal)</code></pre></div>
-<p>Once the package is installed, the user can access to all the functions and data sets included in <code>selbal</code>.</p>
+<p>Once the package is installed, the user can access to all the functions and data sets included in <B>selbal</B> .</p>
 <p><br />
 # Data sets  </p>
 <p>The package includes three datasets: <code>HIV</code>, <code>sCD14</code> and <code>Crohn</code>. The first two correspond to an HIV study (Noguera-Julian et al. 2016 <a href="http://dx.doi.org/10.1016/j.ebiom.2016.01.032" class="uri">http://dx.doi.org/10.1016/j.ebiom.2016.01.032</a>). The third dataset corresponds to a Crohn’s disease study (Gevers et al. 2014 <a href="http://dx.doi.org/10.1016/j.chom.2014.02.005" class="uri">http://dx.doi.org/10.1016/j.chom.2014.02.005</a>).</p>
@@ -101,7 +106,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Calling by their name, the user can get acces to each data set.</p>
 <div id="selbal.cv-function" class="section level2">
 <h2><code>selbal.cv</code> function</h2>
-<p><code>selbal.cv()</code> is the function of <code>selbal</code> package that is intended to answer the following questions:</p>
+<p><code>selbal.cv()</code> is the function of <B>selbal</B>  package that is intended to answer the following questions:</p>
 <ul>
 <li><strong>Which is the optimal number of variables to include in the balance?</strong></li>
 <li><strong>Which are the taxa whose balance is more associated to the response variable?</strong></li>
@@ -112,14 +117,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><code>x</code> is a matrix with the microbiome information. It represents the number of counts or reads for each sample (<em>row</em>) and each taxon (<em>column</em>).</li>
 <li><code>y</code> is a vector with the response variable. It should be specified as a <code>factor</code> if the response variable is dichotomous and <code>numeric</code> if it is continuous.</li>
 </ul>
+<p>The original code has been extended with two additional features: the user can choose the number of variables to be selected <code>(user_numVar)</code> 
+ and, in addition to the AUC, the optimization criteria for a binary response can be the proportion of explained deviance. </p>
+
 <p>Additional parameters of <code>selbal.cv</code> function are:</p>
+
 <ul>
 <li><code>n.fold</code> : a numeric value indicating the number of folds in the cross - validation procedure. When the response variable is dichotomous the cross-validation is performed so that the total proportion of cases and controls is preserved in each fold. Default <code>n.fold = 5</code>.</li>
 <li><code>n.iter</code>: a numeric value indicating the number of iterations to implement; that is, the number of times that the cross - validation process is repeated. Default <code>n.iter = 10</code>.</li>
-<li><code>logit.acc</code>: for dichotomous responses, the method to compute the association parameter. Default it is the AUC- ROC value (<code>logit.acc = &quot;auc&quot;</code>), but other alternatives are also included (see the article to obtain more information); <code>logit.acc = &quot;rsq&quot;</code> or <code>logit.acc = &quot;tjur&quot;</code>.</li>
+<li><code>logit.acc</code>: for dichotomous responses, the method to compute the association parameter. Default it is the AUC- ROC value (<code>logit.acc = &quot;auc&quot;</code>), but other alternatives are also included:  <code>logit.acc = &quot;Dev&quot;</code> for the proportion of explained deviance ,<code>logit.acc = &quot;rsq&quot;</code> or <code>logit.acc = &quot;tjur&quot;</code> (see the paper to obtain more information);.</li>
 <li><code>maxV</code>: the maximum number of variables to be included in a balance. Default <code>maxV = 20</code>.</li>
 <li><code>zero.rep</code> : it defines the method used for the zero-replacement. If it is <code>&quot;bayes&quot;</code> the Bayesian - Multiplicative treatment implemented in <code>{zCompositions}</code> is applied. If it is <code>&quot;one&quot;</code>, a pseudocount of 1 is added to the whole matrix.</li>
 <li><code>opt.cri</code> parameter for selecting the method to determine the optimal number of variables. <code>&quot;max&quot;</code> to define this number as the number of variables which maximizes the association value or <code>&quot;1se&quot;</code> to take also the standard error into account. Default <code>opt.cri = &quot;1se&quot;</code>.</li>
+<li><code>user_numVar</code>: the number of variables to be included in a balance despite of the computed optimal value. Default <code>user_numVar = NULL</code>.</li>
 </ul>
 <p>There are also additional sequndary parameters. To get more information run <code>?selbal.cv</code>.    </p>
 </div>
