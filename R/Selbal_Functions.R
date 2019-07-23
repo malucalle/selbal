@@ -620,6 +620,7 @@
 #                 improvement is not higher than this quantity, it stops.
 #          covar: data.frame with covariates
 #      logit.acc: the accuracy value to return when a logit regression is made
+#    user_numVar: number of variables the user decides to include
 
 # OUTPUT:
 #           $NUM: variables included in the numerator (whole data set)
@@ -662,6 +663,8 @@
 #' number of variables. \code{"max"} to define this number as the number of
 #' variables which maximizes the association value or \code{"1se"} to take also
 #' the standard error into account.
+#' @param user_numVar parameter to modify the choosen optimal number of variables. 
+#' If it is used, it is the final number of variables used in the method.
 #'
 #'
 #' @return A \code{list} with the following objects:
@@ -758,7 +761,6 @@
     cat(paste("\n\n###############################################################",
               "\n STARTING selbal.cv FUNCTION",
               "\n###############################################################"))
-
     # Log-transformed counts (with zero replacement
     cat(paste(
       "\n\n#-------------------------------------------------------------#",
@@ -1750,8 +1752,8 @@
 #' each of the two considered groups.
 #' @param logit.acc when \code{y} is dichotomous, the measure to compute for
 #' the correlation between \code{y} and the proposed \emph{balance}
-#' adjusting for covariates. One of the following values: \code{"Rsq"} (default),
-#'  \code{"AUC"} or \code{"Tjur"}.
+#' adjusting for covariates. One of the following values: \code{"AUC"} (default),
+#' \code{"Dev"}, \code{"Rsq"} or \code{"Tjur"}.
 #'
 #' @return A graphical representation of the balance for the selected
 #' individuals and the variables taking part on it.
