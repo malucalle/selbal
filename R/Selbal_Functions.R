@@ -1,4 +1,3 @@
-library(selbal)
 
 
 # Define the function selbal
