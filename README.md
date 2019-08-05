@@ -16,7 +16,7 @@ the following instructions:
   # Option 1 (non - Windows users)
     devtools::install_github(repo = "UVic-omics/selbal")
   # Option 2 (for Windows users)
-    install_url(url="https://github.com/UVic-omics/selbal/archive/master.zip", 
+    devtools::install_url(url="https://github.com/UVic-omics/selbal/archive/master.zip", 
                 INSTALL_opt= "--no-multiarch")
     
 # Loading the library
