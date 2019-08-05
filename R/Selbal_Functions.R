@@ -1,81 +1,4 @@
-
-################################################################################
-# FUNCTION: selbal
-################################################################################
-
-#' Looks for a highly-associated balance with a response variable
-#'
-#'
-#' @param x a \code{matrix} object with the information of variables
-#' (\emph{columns}) for each sample (\emph{rows}).
-#' @param y the response variable, either continuous or dichotomous.
-#' @param th.imp a numeric value indicating the minimum increment required in
-#' the association parameter between two consecutive steps in order to continue
-#' with the variable addition into the \emph{balance}.
-#' @param covar \code{data.frame} with the variables to adjust for
-#' (\emph{columns}).
-#' @param logit.acc when \code{y} is dichotomous, the measure to compute for
-#' the correlation between \code{y} and the proposed \emph{balance}
-#' adjusting for covariates. One of the following values: \code{"AUC"} (default),
-#'  \code{"Dev"}, \code{"Rsq"} or \code{"Tjur"}.
-#' @param logt \code{logical} value determining if \code{x} needs a
-#' log-transformation. TRUE if \code{x} contains raw counts or proportions.
-#' @param tab \code{logical} value. It specifies if a table with the variables
-#' included in the balance (ordered) and the evolution of the association
-#' parameter is demanded.
-#' @param draw \code{logical} value to concretif a plot with the balance value
-#' and the response variable is desired.
-#' @param col \code{vector} of two colours for differentiate the variables
-#' appearing in the numerator and in the denominator of the balances.
-#' @param maxV \code{numeric} value defining the maximum number of variables
-#' composing the balance. Default 1e10 to give prevalence to \code{th.imp}
-#' parameter.
-#' @param zero.rep a value defining the method to use for zero - replacement.
-#' \code{"bayes"} for BM-replacement or \code{"one"} to add one read tho each
-#' cell of the matrix.
-#' @param opt.cri parameter for selecting the method to determine the optimal
-#' number of variables. \code{"max"} to define this number as the number of
-#' variables which maximizes the association value or \code{"1se"} to take also
-#' the standard error into account.
-#'
-#'
-#'
-#' @return A \code{list} with the following objects:
-#'
-#'
-#' \itemize{
-#'
-#' \item \code{FINAL.BAL} the numeric values of the selected balance for each
-#' sample.
-#' \item \code{POS} a vector with the variables appearing in the numerator of
-#' the \emph{balance}.
-#' \item \code{NEG} a vector with the variables appearing in the denominator of
-#' the \emph{balance}.
-#' \item \code{INC.VAR} a vector with both \code{POS} and \code{NUM} variables
-#' (included variables).
-#' \item \code{ACC.Bal} a vector with the association value after each step of
-#' the algorithm.
-#' \item \code{EVOL} a \code{data.frame} with the variables sorted as they have
-#' been added into the balance with the corresponding association value after
-#' their inclusion. Only returned if \code{tab} is \code{TRUE}.
-#' \item \code{FINAL.P} the graphical representation of the results. Only
-#' showed if \code{draw = T}.
-#' \item \code{FIT.Final} the regression model taking covariates and the final
-#' balance as the explanatory variables and \code{y} as the response variable.
-#'
-#' }
-#'
-#' @examples
-#' # Load data set
-#'   load("HIV.rda")
-#' # Define x and y
-#'   x <- HIV[,1:60]
-#'   y <- HIV[,62]
-#' # Run the algorithm
-#'   Bal <- selbal(x,y)
-#' @export selbal
-
-
+library(selbal)
 
 
 # Define the function selbal
@@ -83,6 +6,7 @@
                      logt=T, col = c("steelblue1", "tomato1"), tab=T,
                      draw=T, maxV = 1e10, zero.rep = "bayes"){
 
+        nulldev0<<-glm(y~1, family=binomial())[[10]]
 
   #----------------------------------------------------------------------------#
   # STEP 0: load libraries and extract information
@@ -91,7 +15,6 @@
     #----------------------------------------------#
     # 0.1: information about the response variable
     #----------------------------------------------#
-
     # Class of the response variable
       classy <- class(y)
     # Family for the glm (default: gaussian)
@@ -212,7 +135,7 @@
 
     #--------------------------------------------------------------------------#
     # Auxiliar function to compute the "association value" when adding a new
-    # variable into the balance
+    # variable into the balance*
     #--------------------------------------------------------------------------#
 
     balance.adding.cor <- function(x, LogCounts, POS, NEG, numy, covar=NULL){
@@ -346,7 +269,7 @@
           ACC.ref <- ACC.set
 
         # Function to extract the p-value
-          add2bal.ACC <- matrix(, nrow = 0, ncol = 2)
+          add2bal.ACC <- matrix(0, nrow = 0, ncol = 2)
 
         # Solve the problem with libraries
           suppressWarnings(suppressMessages(library("CMA")))
@@ -404,7 +327,7 @@
           ACC.ref <- ACC.set
 
         # Function to extract the p-value
-          add2bal.ACC <- matrix(, nrow = 0, ncol = 2)
+          add2bal.ACC <- matrix(0, nrow = 0, ncol = 2)
 
         # Solve the problem with libraries
           suppressWarnings(suppressMessages(library("CMA")))
@@ -460,6 +383,8 @@
       FINAL.BAL <- sqrt((k1*k2)/(k1+k2))*
         (rowM(logCounts[,POS])- rowM(logCounts[,NEG]))
 
+  # Draw the plot if draw == T
+  if (draw){
   #----------------------------------------------------------------------------#
   # GRAPHICAL REPRESENTATION
   #----------------------------------------------------------------------------#
@@ -589,17 +514,28 @@
       }
 
   # Draw the plot if draw == T
-    if (draw){grid.draw(FINAL.P)}
+      grid.draw(FINAL.P)
+	}#end plot
+
+
 
     # Round the values
       if(tab){
         EVOL[,3]<-round(as.numeric(EVOL[,3]),5)
         EVOL[,4]<-round(as.numeric(EVOL[,4]),5)
-        L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL, FINAL.P,
+		if (draw== TRUE){
+			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL, FINAL.P,
                   FIT.final)
+		} else {
+			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL)
+   	    }
       } else{
-        L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, FINAL.P,
+		if (draw== TRUE){
+			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, FINAL.P,
                   FIT.final)
+		} else {
+			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal)
+   	    }
       }
 
       return(L)
@@ -2333,7 +2269,8 @@
     } else if (logit.acc == "Tjur"){
       d <- mean(FIT$fitted.values[y==1]) - mean(FIT$fitted.values[y==0])
     } else if (logit.acc == "Dev"){
-      d<-1-(deviance(FIT)/glm(y~1, family=binomial())[[10]])  # proportion of explained deviance
+#      d<-1-(deviance(FIT)/glm(y~1, family=binomial())[[10]])  # proportion of explained deviance
+      d<-1-(deviance(FIT)/nulldev0)  # proportion of explained deviance
     }
     
     # Return the value
