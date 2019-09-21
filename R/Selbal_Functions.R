@@ -1,3 +1,4 @@
+library(selbal)
 
 
 # Define the function selbal
@@ -5,7 +6,9 @@
                      logt=T, col = c("steelblue1", "tomato1"), tab=T,
                      draw=T, maxV = 1e10, zero.rep = "bayes"){
 
-        nulldev0<<-glm(y~1, family=binomial())[[10]]
+        # nulldev0<<-glm(y~1, family=binomial())[[10]]
+    y1=as.numeric(y)
+    nulldev0<<-glm(y1~1)[[10]]
 
   #----------------------------------------------------------------------------#
   # STEP 0: load libraries and extract information
