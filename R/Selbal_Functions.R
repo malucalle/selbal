@@ -100,8 +100,8 @@
 
             # Add the value into the matrix
               ifelse(FIT$coefficients[2]>0,
-                     M[i,j] <- logit.cor(FIT, y = y, covar = covar, logit.acc),
-                     M[j,i] <- logit.cor(FIT, y = y, covar = covar, logit.acc))
+                     M[i,j] <- logit.cor(FIT, y = y, covar = covar, logit.acc),  #CANVI Y
+                     M[j,i] <- logit.cor(FIT, y = y, covar = covar, logit.acc)) #CANVI Y
 
             } # End j
           } # End i
@@ -163,7 +163,7 @@
         FIT.pos <- glm(numy~., data=D.pos, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
         if(classy=="numeric"){ C.pos <- mean(FIT.pos$residuals^2)
-        }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}
+        }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)} #diferencies
 
       #----------------------------------------#
       # If x added into the numerator, . .
@@ -183,7 +183,7 @@
         FIT.neg <- glm(numy~., data=D.neg, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
         if(classy=="numeric"){ C.neg <- mean(FIT.neg$residuals^2)
-        }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}
+        }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}  #diferencies
 
       # Correlation values
         COR <- c(C.pos, C.neg)
@@ -230,7 +230,7 @@
 
     # Define the initial "accuracy" or "association" value
       if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
-      }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}
+      }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}   #diferencies  numy
 #browser()
 
   #----------------------------------------------------------------------------#
@@ -297,7 +297,7 @@
 
         # If there is an improvement, . . .
           #if (abs(ACC.set - ACC.ref) > th.imp){
-          if ((ACC.set - ACC.ref) > th.imp){   #*** canvi ***
+          if ((ACC.set - ACC.ref) < th.imp){   
             INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
             ACC.Bal <- c(ACC.Bal, ACC.set)
             nV <- nV + 1
@@ -353,8 +353,7 @@
           ACC.set <- max(add2bal.ACC)
 
         # If there is an improvement, . . .
-          if ((ACC.set - ACC.ref) > th.imp){    #**** canvi ***
-          #if (abs(ACC.set - ACC.ref) > th.imp){    #**** canvi ***
+          if ((ACC.set - ACC.ref) > th.imp){   
             # Add the included variable
               INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
             # Add the Accuracy value
@@ -470,7 +469,7 @@
         ROC.TAB <- ROC.TAB[order(ROC.TAB$y),]
       # AUC value
         #auc.val <- round(logit.cor(FIT.final,y = U$numy, covar = covar, logit.acc = logit.acc),3)
-        auc.val<-round(as.numeric(auc(y, FIT.final$fitted.values)),3)
+        auc.val<-round(as.numeric(auc(y, FIT.final$fitted.values)),3)   #diferencies
       # The plot
         ROC.plot <- ggplot(data=ROC.TAB, aes(x=x, y=y)) +
                     geom_line() +
@@ -919,7 +918,7 @@
 
     # Define NUM and DEN according to opt.M
     suppressMessages(BAL <- selbal.aux(x, y, th.imp = 0, covar = covar,
-                                       logit.acc, logt=T, maxV = opt.M))
+                                       logit.acc, logt=T, maxV = opt.M)) #diferencies logit.acc=logit.acc
   # Variables in the NUMERATOR and the DENOMINATOR
     NUM <- BAL[BAL[,2]=="NUM","Taxa"]
     DEN <- BAL[BAL[,2]=="DEN","Taxa"]
@@ -1335,8 +1334,8 @@
 
             # Add the value into the matrix
             ifelse(FIT$coefficients[2]>0,
-                   M[i,j] <- logit.cor(FIT, y = y, covar = covar, logit.acc),
-                   M[j,i] <- logit.cor(FIT, y = y, covar = covar, logit.acc))
+                   M[i,j] <- logit.cor(FIT, y = y, covar = covar, logit.acc),#diferencies Y  covar
+                   M[j,i] <- logit.cor(FIT, y = y, covar = covar, logit.acc)) #diferencies Y  covar
 
           } # End j
         } # End i
@@ -1395,7 +1394,7 @@
       FIT.pos <- glm(numy~., data=D.pos, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
       if(classy=="numeric"){ C.pos <- mean(FIT.pos$residuals^2)
-      }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}
+      }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}#diferencies covar
 
       #----------------------------------------#
       # If x added into the numerator, . .
@@ -1415,7 +1414,7 @@
       FIT.neg <- glm(numy~., data=D.neg, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
       if(classy=="numeric"){ C.neg <- mean(FIT.neg$residuals^2)
-      }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}
+      }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}  #diferencies covar
 
       # Correlation values
       COR <- c(C.pos, C.neg)
@@ -1471,7 +1470,7 @@
 
     # Define the initial "accuracy" or "association" value
     if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
-    }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}
+    }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}#diferencies covar
 
 
     #----------------------------------------------------------------------------#
@@ -1526,10 +1525,10 @@
         # Modify p.set
         ACC.set <- min(add2bal.ACC)
 
+      
         # If there is an improvement, . . .
-        # If there is an improvement, . . .
-        #if (abs(ACC.set - ACC.ref) > th.imp){    #**** canvi ***
-          if ((ACC.set - ACC.ref) > th.imp){
+        #if (abs(ACC.set - ACC.ref) > th.imp){    
+        if ((ACC.set - ACC.ref) < th.imp){
           INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
           nV <- nV + 1
           if (ACC.opt[2]==1){
@@ -1828,7 +1827,8 @@
       # Order them for a correct representation
         ROC.TAB <- ROC.TAB[order(ROC.TAB$y),]
       # AUC value
-        auc.val<-round(as.numeric(auc(y, FIT.final$fitted.values)),3)
+        #auc.val <- round(logit.cor(FIT.final,y = U$numy, logit.acc = logit.acc),3)
+        auc.val<-round(as.numeric(auc(y, FIT.final$fitted.values)),3)  #diferencies
       # The plot
         ROC.plot <- ggplot(data=ROC.TAB, aes(x=x, y=y)) +
           geom_line() +
@@ -2277,7 +2277,8 @@
     } else if (logit.acc == "Rsq"){
       d <- cor(as.numeric(y), FIT$fitted.values)^2
     } else if (logit.acc == "Tjur"){
-      d <- mean(FIT$fitted.values[y==1]) - mean(FIT$fitted.values[y==0])
+      if (class(y) == "factor") {numy<-as.numeric(y)-1} else {numy<-y}
+      d <- mean(FIT$fitted.values[numy==1]) - mean(FIT$fitted.values[numy==0])
     } else if (logit.acc == "Dev"){
       f.class <- ifelse (class(y) == "factor", "binomial", "gaussian")
       if (class(y) == "factor") {numy<-as.numeric(y)-1} else {numy<-y}
