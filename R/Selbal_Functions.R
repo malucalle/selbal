@@ -1,4 +1,4 @@
-library(selbal)
+#library(selbal)
 
 
 # Define the function selbal
@@ -6,10 +6,9 @@ library(selbal)
                      logt=T, col = c("steelblue1", "tomato1"), tab=T,
                      draw=T, maxV = 1e10, zero.rep = "bayes"){
 
-        # nulldev0<<-glm(y~1, family=binomial())[[10]]
-    y1=as.numeric(y)
-    nulldev0<<-glm(y1~1)[[10]]
-
+      # y1=as.numeric(y)
+      # nulldev0<-deviance(glm(y1~1))
+      # 
   #----------------------------------------------------------------------------#
   # STEP 0: load libraries and extract information
   #----------------------------------------------------------------------------#
@@ -28,7 +27,7 @@ library(selbal)
         ylev <- levels(y)
         numy <- as.numeric(y) - 1
         f.class <- "binomial"
-        nulldev0<<-glm(y~1, family=binomial())[[10]]
+  #      nulldev0<-deviance(glm(numy~1, family=f.class))
       }
 
     #------------------------------------------------------------------#
@@ -101,11 +100,13 @@ library(selbal)
 
             # Add the value into the matrix
               ifelse(FIT$coefficients[2]>0,
-                     M[i,j] <- logit.cor(FIT, y = Y, logit.acc),
-                     M[j,i] <- logit.cor(FIT, y = Y, logit.acc))
+                     M[i,j] <- logit.cor(FIT, y = y, covar = covar, logit.acc),
+                     M[j,i] <- logit.cor(FIT, y = y, covar = covar, logit.acc))
 
             } # End j
           } # End i
+          
+ 
 
         # Indices for the highest logit.cor value
           r <- which(M == max(M), arr.ind = T)
@@ -124,11 +125,13 @@ library(selbal)
             } # End j
           } # End i
 
+
+
         # Indices for the lowest MSE value
           r <- which(M == min(M), arr.ind = T)
         }
 
-
+#browser()
       # Return the row and column of the maximum value
         return(r)
       }
@@ -160,7 +163,7 @@ library(selbal)
         FIT.pos <- glm(numy~., data=D.pos, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
         if(classy=="numeric"){ C.pos <- mean(FIT.pos$residuals^2)
-        }else{ C.pos <- logit.cor(FIT.pos,numy,logit.acc)}
+        }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}
 
       #----------------------------------------#
       # If x added into the numerator, . .
@@ -180,7 +183,7 @@ library(selbal)
         FIT.neg <- glm(numy~., data=D.neg, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
         if(classy=="numeric"){ C.neg <- mean(FIT.neg$residuals^2)
-        }else{ C.neg <- logit.cor(FIT.neg,numy,logit.acc)}
+        }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}
 
       # Correlation values
         COR <- c(C.pos, C.neg)
@@ -227,8 +230,8 @@ library(selbal)
 
     # Define the initial "accuracy" or "association" value
       if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
-      }else{ ACC.Bal <- logit.cor(FIT.initial, numy, logit.acc)}
-
+      }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}
+#browser()
 
   #----------------------------------------------------------------------------#
 
@@ -293,7 +296,8 @@ library(selbal)
           ACC.set <- min(add2bal.ACC)
 
         # If there is an improvement, . . .
-          if (abs(ACC.set - ACC.ref) > th.imp){
+          #if (abs(ACC.set - ACC.ref) > th.imp){
+          if ((ACC.set - ACC.ref) > th.imp){   #*** canvi ***
             INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
             ACC.Bal <- c(ACC.Bal, ACC.set)
             nV <- nV + 1
@@ -349,7 +353,8 @@ library(selbal)
           ACC.set <- max(add2bal.ACC)
 
         # If there is an improvement, . . .
-          if ((ACC.set - ACC.ref) > th.imp){
+          if ((ACC.set - ACC.ref) > th.imp){    #**** canvi ***
+          #if (abs(ACC.set - ACC.ref) > th.imp){    #**** canvi ***
             # Add the included variable
               INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
             # Add the Accuracy value
@@ -464,7 +469,8 @@ library(selbal)
       # Order them for a correct representation
         ROC.TAB <- ROC.TAB[order(ROC.TAB$y),]
       # AUC value
-        auc.val <- round(logit.cor(FIT.final,y = U$numy, logit.acc = logit.acc),3)
+        #auc.val <- round(logit.cor(FIT.final,y = U$numy, covar = covar, logit.acc = logit.acc),3)
+        auc.val<-round(as.numeric(auc(y, FIT.final$fitted.values)),3)
       # The plot
         ROC.plot <- ggplot(data=ROC.TAB, aes(x=x, y=y)) +
                     geom_line() +
@@ -1329,14 +1335,15 @@ library(selbal)
 
             # Add the value into the matrix
             ifelse(FIT$coefficients[2]>0,
-                   M[i,j] <- logit.cor(FIT, y = Y, logit.acc),
-                   M[j,i] <- logit.cor(FIT, y = Y, logit.acc))
+                   M[i,j] <- logit.cor(FIT, y = y, covar = covar, logit.acc),
+                   M[j,i] <- logit.cor(FIT, y = y, covar = covar, logit.acc))
 
           } # End j
         } # End i
 
         # Indices for the highest logit.cor value
         r <- which(M == max(M), arr.ind = T)
+        
 
       } else {
         for (i in 2:n){
@@ -1388,7 +1395,7 @@ library(selbal)
       FIT.pos <- glm(numy~., data=D.pos, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
       if(classy=="numeric"){ C.pos <- mean(FIT.pos$residuals^2)
-      }else{ C.pos <- logit.cor(FIT.pos,numy,logit.acc)}
+      }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}
 
       #----------------------------------------#
       # If x added into the numerator, . .
@@ -1408,7 +1415,7 @@ library(selbal)
       FIT.neg <- glm(numy~., data=D.neg, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
       if(classy=="numeric"){ C.neg <- mean(FIT.neg$residuals^2)
-      }else{ C.neg <- logit.cor(FIT.neg,numy,logit.acc)}
+      }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}
 
       # Correlation values
       COR <- c(C.pos, C.neg)
@@ -1464,7 +1471,7 @@ library(selbal)
 
     # Define the initial "accuracy" or "association" value
     if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
-    }else{ ACC.Bal <- logit.cor(FIT.initial, numy, logit.acc)}
+    }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}
 
 
     #----------------------------------------------------------------------------#
@@ -1498,7 +1505,7 @@ library(selbal)
         ACC.ref <- ACC.set
 
         # Function to extract the p-value
-        add2bal.ACC <- matrix(, nrow = 0, ncol = 2)
+        add2bal.ACC <- matrix(,nrow = 0, ncol = 2)
 
         # Solve the problem with libraries
         suppressWarnings(suppressMessages(library("CMA")))
@@ -1521,7 +1528,8 @@ library(selbal)
 
         # If there is an improvement, . . .
         # If there is an improvement, . . .
-        if (abs(ACC.set - ACC.ref) > th.imp){
+        #if (abs(ACC.set - ACC.ref) > th.imp){    #**** canvi ***
+          if ((ACC.set - ACC.ref) > th.imp){
           INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
           nV <- nV + 1
           if (ACC.opt[2]==1){
@@ -1553,7 +1561,7 @@ library(selbal)
           ACC.ref <- ACC.set
 
           # Function to extract the p-value
-          add2bal.ACC <- matrix(, nrow = 0, ncol = 2)
+          add2bal.ACC <- matrix(,nrow = 0, ncol = 2)
 
           # Solve the problem with libraries
           suppressWarnings(suppressMessages(library("CMA")))
@@ -1820,7 +1828,7 @@ library(selbal)
       # Order them for a correct representation
         ROC.TAB <- ROC.TAB[order(ROC.TAB$y),]
       # AUC value
-        auc.val <- round(logit.cor(FIT.final,y = U$numy, logit.acc = logit.acc),3)
+        auc.val<-round(as.numeric(auc(y, FIT.final$fitted.values)),3)
       # The plot
         ROC.plot <- ggplot(data=ROC.TAB, aes(x=x, y=y)) +
           geom_line() +
@@ -2263,16 +2271,22 @@ library(selbal)
   #' @export logit.cor
   
   # Define the function logit.cor
-  logit.cor <- function(FIT, y, logit.acc){
+  logit.cor <- function(FIT, y, covar = NULL,logit.acc){
     if (logit.acc == "AUC"){
       d <- as.numeric(auc(y, FIT$fitted.values))
     } else if (logit.acc == "Rsq"){
-      d <- cor(y, FIT$fitted.values)^2
+      d <- cor(as.numeric(y), FIT$fitted.values)^2
     } else if (logit.acc == "Tjur"){
       d <- mean(FIT$fitted.values[y==1]) - mean(FIT$fitted.values[y==0])
     } else if (logit.acc == "Dev"){
-#      d<-1-(deviance(FIT)/glm(y~1, family=binomial())[[10]])  # proportion of explained deviance
-      d<-1-(deviance(FIT)/nulldev0)  # proportion of explained deviance
+      f.class <- ifelse (class(y) == "factor", "binomial", "gaussian")
+      if (class(y) == "factor") {numy<-as.numeric(y)-1} else {numy<-y}
+      #if (is.null(covar)){
+        d<-1-(deviance(FIT)/deviance(glm(numy~1,family=f.class)))  # proportion of explained deviance
+      # } else {
+      # d<-1-(deviance(FIT)/deviance(glm(numy~., data=cbind(numy,covar),family=f.class)))  # proportion of explained deviance
+      # }
+      # d<-1-(deviance(FIT)/nulldev0)  # proportion of explained deviance
     }
     
     # Return the value
