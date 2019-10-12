@@ -892,7 +892,9 @@
       # Define the minimum mean value
         m <- which.min(ACC.mean)
       # The minimum value under ACC.mean[m] + SE
+        if(length(which((ACC.mean<(ACC.mean[m] + ACC.se[m]))==T))>0){
         mv <- min(which((ACC.mean<(ACC.mean[m] + ACC.se[m]))==T))
+        } else {mv<-m}
 
       # Depending on "opt.cri":
         if (opt.cri == "1se"){opt.M <- mv + 1
@@ -901,7 +903,9 @@
         # Define the maximum ACC value
           m <- which.max(ACC.mean)
         # The minimum value whith ACC.mean over ACC.mean[m] - ACC.sd[m]
+          if(length(which((ACC.mean>(ACC.mean[m] - ACC.se[m]))==T))>0){
           mv <- min(which((ACC.mean>(ACC.mean[m] - ACC.se[m]))==T))
+          } else {mv<-m}
 
       # Depending on "opt.cri":
       if (opt.cri == "1se"){opt.M <- mv + 1
