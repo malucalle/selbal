@@ -503,7 +503,7 @@
                     coord_flip()
         # Density plot 2 for the balance
         ydensity2 <- ggplot(U, aes(V1, fill=y)) +
-          geom_density(alpha=.5, size=1.25) +
+          geom_density(alpha=.5, size=1) +
           scale_fill_manual(values = col) +
           theme_bw() + xlab("") + ylab("") +
           theme(legend.position = "none")
@@ -1916,7 +1916,7 @@
           coord_flip()
         # Density plot 2 for the balance
         ydensity2 <- ggplot(U, aes(V1, fill=y)) +
-          geom_density(alpha=.5, size=1.25) +
+          geom_density(alpha=.5, size=1.) +
           scale_fill_manual(values = col) +
           theme_bw() + xlab("") + ylab("") +
           theme(legend.position = "none")
