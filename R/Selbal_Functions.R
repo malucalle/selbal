@@ -407,6 +407,7 @@
     # Variables included
       T1 <- c("NUMERATOR", POS)
       T2 <- c("DENOMINATOR",NEG)
+      
     # Parameter to specify the limits for writting
       yl <- max(length(T1), length(T2)) + .5
 
@@ -426,6 +427,37 @@
                  colour = c("royalblue1",rep("black",length(T2)-1)),
                  fontface = 2)
 
+      # Parameter 2 to specify the limits for writting
+      T1 <- c(POS,"A")
+      T2 <- c(NEG,"B")
+      yl2 <- max(length(T1), length(T2));
+      yl2 <- yl2*1.05;
+      escal <- 3;
+      bot <- 5*escal*yl2/100;
+
+      # Empty plot 2 with text
+      ndiv = max(3,floor(yl2))+1;
+      lineh <- 0 # 0.5*ceiling(yl-length(T1));
+      df2 <- data.frame()
+      Imp.table2 <- ggplot(df2) + xlim(0, 100) + ylim(-bot, ndiv) + theme_void() +
+        geom_segment(aes(x = 10, y = lineh, xend = 90, yend = lineh),color="red", size=1.3) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50+escal, yend = lineh-bot),color="red", size=1) +
+        geom_segment(aes(x = 50+escal, y = lineh-bot, xend = 50+escal, yend = lineh),color="red", size=1) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50-escal, yend = lineh),color="red", size=1) +
+        annotate("text",
+                 x = 75,
+                 y = seq(bot, floor(yl2), length.out = ndiv),
+                 label = c(T1,rep("",ndiv-length(T1))),
+                 colour = c(rep("royalblue1",length(T1)-1),rep("black",ndiv-length(T1)+1)),
+                 fontface = 2) +
+        annotate("text",
+                 x = 25,
+                 y = seq(bot, floor(yl2), length.out = ndiv),
+                 label = c(T2,rep("",ndiv-length(T2))),
+                 colour = c(rep("royalblue1",length(T2)-1),rep("black",ndiv-length(T2)+1)),
+                 fontface = 2)
+      
+      
     #-----------------------------------------#
     # SECOND: The representation of the plots
     #-----------------------------------------#
@@ -443,15 +475,24 @@
       # The composition of the final plot
       #---------------------------------------------------#
 
-      # BOXPLOT
+        # BOXPLOT 1
         BoxP <-  ggplot(U, aes(x=y, y=V1, fill=y)) +
-          geom_boxplot(color="black", size=1, ) +
+          geom_boxplot(color="black", size=1) +
           scale_fill_manual(values=col) +
           theme_bw() +
           ylab("Balance") +
           xlab("Factor") +
           theme(legend.position = "none")
-      # Density plot for the balance
+        # BOXPLOT 2
+        BoxP2 <-  ggplot(U, aes(x=y, y=V1, fill=y)) +
+          geom_boxplot(color="black", size=1) +
+          scale_fill_manual(values=col) +
+          theme_bw() +
+          ylab("Balance") +
+          xlab("") +
+          theme(legend.position = "none")+coord_flip()
+        
+        # Density plot 1 for the balance
         ydensity <- ggplot(U, aes(V1, fill=y)) +
                     geom_density(alpha=.5, size=1.25) +
                     scale_fill_manual(values = col) +
@@ -460,6 +501,12 @@
                           axis.text.x=element_blank(),
                           axis.ticks.x=element_blank()) +
                     coord_flip()
+        # Density plot 2 for the balance
+        ydensity2 <- ggplot(U, aes(V1, fill=y)) +
+          geom_density(alpha=.5, size=1.25) +
+          scale_fill_manual(values = col) +
+          theme_bw() + xlab("") + ylab("") +
+          theme(legend.position = "none")
 
       # ROC - curve
         library(pROC)
@@ -490,7 +537,10 @@
         FINAL.P <- arrangeGrob(Imp.table, ROC.plot, BoxP, ydensity,
                                ncol=2, nrow=2, widths=c(5,1.25), heights=c(2, 5),
                                vp=viewport(width=0.8, height=0.8))
-
+        FINAL.P2 <- arrangeGrob(Imp.table2, BoxP2, ydensity2,
+                               ncol=1, nrow=3, widths=4, heights=c(4, 4, 4),
+                               vp=viewport(width=0.75, height=1))
+        
       } else {
 
         # Fit the regression model
@@ -520,33 +570,33 @@
         FINAL.P <- arrangeGrob(Imp.table, PLOT.G, nrow=2,
                                heights=c(0.2,0.5),vp=viewport(width=0.8,
                                                               height=0.8))
-
+        FINAL.P2 = FINAL.P;
       }
 
-  # Draw the plot if draw == T
+      # Draw the plot if draw == T
       grid.draw(FINAL.P)
-	}#end plot
+	}  #end plot
 
-
+      if (classy=="numeric") ROC.plot=NULL
 
     # Round the values
-      if(tab){
+    if(tab){
         EVOL[,3]<-round(as.numeric(EVOL[,3]),5)
         EVOL[,4]<-round(as.numeric(EVOL[,4]),5)
-		if (draw== TRUE){
-			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL, FINAL.P,
-                  FIT.final)
-		} else {
-			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL)
-   	    }
-      } else{
-		if (draw== TRUE){
-			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, FINAL.P,
-                  FIT.final)
-		} else {
-			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal)
-   	    }
-      }
+    		if (draw== TRUE){
+    		  L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL, global.plot=FINAL.P,
+                      FIT.final,global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
+    		} else {
+    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL)
+       	}
+    } else {
+    		if (draw== TRUE){
+    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, global.plot=FINAL.P,
+                      FIT.final,global.plot2 = FINAL.P, ROC.plot = ROC.plot)
+    		} else {
+    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal)
+       	}
+    }
 
       return(L)
   }
@@ -1173,7 +1223,9 @@
     # Build a list with the elements of interest
     L <- list(accuracy.nvar = MSE.Boxplot,
               var.barplot = IMP.plot,
-              global.plot = PLOT.Global,
+              global.plot = PLOT.Global$Global.plot, 
+              global.plot2 = PLOT.Global$Global.plot2,
+              ROC.plot = PLOT.Global$ROC.plot,
               cv.tab = dat,
               cv.accuracy = ACC.Matrix[(opt.M - 1),],
               global.balance = BAL,
@@ -1756,10 +1808,10 @@
     # Variables included
       T1 <- c("NUMERATOR", POS)
       T2 <- c("DENOMINATOR",NEG)
-    # Parameter to specify the limits for writting
+      # Parameter to specify the limits for writting
       yl <- max(length(T1), length(T2)) + .5
 
-    # Empty plot with text
+    # Empty plot 1 with text
       df <- data.frame()
       Imp.table <- ggplot(df) + xlim(0, 100) + ylim(-0.5, yl) + theme_void() +
         annotate("text",
@@ -1774,7 +1826,37 @@
                  label = T2,
                  colour = c("royalblue1",rep("black",length(T2)-1)),
                             fontface = 2)
-
+      # Parameter 2 to specify the limits for writting
+      T1 <- c(POS,"A")
+      T2 <- c(NEG,"B")
+      yl2 <- max(length(T1), length(T2));
+      yl2 <- yl2*1.05;
+      escal <- 3;
+      bot <- 5*escal*yl2/100;
+      
+      # Empty plot 2 with text
+      ndiv = max(3,floor(yl2))+1;
+      lineh <- 0 # 0.5*ceiling(yl-length(T1));
+      df2 <- data.frame()
+      Imp.table2 <- ggplot(df2) + xlim(0, 100) + ylim(-bot, ndiv) + theme_void() +
+        geom_segment(aes(x = 10, y = lineh, xend = 90, yend = lineh),color="red", size=1.3) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50+escal, yend = lineh-bot),color="red", size=1) +
+        geom_segment(aes(x = 50+escal, y = lineh-bot, xend = 50+escal, yend = lineh),color="red", size=1) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50-escal, yend = lineh),color="red", size=1) +
+        annotate("text",
+                 x = 75,
+                 y = seq(bot, floor(yl2), length.out = ndiv),
+                 label = c(T1,rep("",ndiv-length(T1))),
+                 colour = c(rep("royalblue1",length(T1)-1),rep("black",ndiv-length(T1)+1)),
+                 fontface = 2) +
+        annotate("text",
+                 x = 25,
+                 y = seq(bot, floor(yl2), length.out = ndiv),
+                 label = c(T2,rep("",ndiv-length(T2))),
+                 colour = c(rep("royalblue1",length(T2)-1),rep("black",ndiv-length(T2)+1)),
+                 fontface = 2)
+      
+      
 
     #--------------------------------------------------------------------------#
     # STEP 2: the rest of the plots depending on the type of variable
@@ -1807,7 +1889,7 @@
       # The composition of the final plot
       #---------------------------------------------------#
 
-      # BOXPLOT
+        # BOXPLOT 1
         BoxP <-  ggplot(U, aes(x=numy, y=V1, fill=y)) +
           geom_boxplot(color="black", size=1) +
           scale_fill_manual(values=col) +
@@ -1815,7 +1897,15 @@
           ylab("Balance") +
           xlab("Factor") +
           theme(legend.position = "none")
-      # Density plot for the balance
+        # BOXPLOT 2
+        BoxP2 <-  ggplot(U, aes(x=y, y=V1, fill=y)) +
+          geom_boxplot(color="black", size=1) +
+          scale_fill_manual(values=col) +
+          theme_bw() +
+          ylab("Balance") +
+          xlab("") +
+          theme(legend.position = "none")+coord_flip()
+        # Density plot 1 for the balance
         ydensity <- ggplot(U, aes(V1, fill=y)) +
           geom_density(alpha=.5, size=1.25) +
           scale_fill_manual(values = col) +
@@ -1824,7 +1914,13 @@
                 axis.text.x=element_blank(),
                 axis.ticks.x=element_blank()) +
           coord_flip()
-
+        # Density plot 2 for the balance
+        ydensity2 <- ggplot(U, aes(V1, fill=y)) +
+          geom_density(alpha=.5, size=1.25) +
+          scale_fill_manual(values = col) +
+          theme_bw() + xlab("") + ylab("") +
+          theme(legend.position = "none")
+        
       # ROC - curve
         library(pROC)
       # Build ROC curve
@@ -1855,7 +1951,10 @@
         FINAL.P <- arrangeGrob(Imp.table, ROC.plot, BoxP, ydensity,
                                ncol=2, nrow=2, widths=c(5,1), heights=c(2, 5),
                                vp=viewport(width=0.8, height=0.8))
-
+        FINAL.P2 <- arrangeGrob(Imp.table2, BoxP2, ydensity2,
+                               ncol=1, nrow=3, widths=4, heights=c(4, 4, 4),
+                               vp=viewport(width=0.75, height=1))
+        
 
       } else {
 
@@ -1889,12 +1988,15 @@
         FINAL.P <- arrangeGrob(Imp.table, PLOT.G, nrow=2,
                                heights=c(0.2,0.5),vp=viewport(width=0.8,
                                                               height=0.8))
-
+        FINAL.P2 = FINAL.P;
       }
 
-
-      return(FINAL.P)
-
+      # Build a list with the elements of interest
+      L <- list(Global.plot = FINAL.P,Global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
+      
+      return(L)
+      
+#      return(FINAL.P)
 
     }
 
