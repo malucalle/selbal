@@ -8,7 +8,7 @@
 
       # y1=as.numeric(y)
       # nulldev0<-deviance(glm(y1~1))
-      # 
+      #
   #----------------------------------------------------------------------------#
   # STEP 0: load libraries and extract information
   #----------------------------------------------------------------------------#
@@ -105,8 +105,8 @@
 
             } # End j
           } # End i
-          
- 
+
+
 
         # Indices for the highest logit.cor value
           r <- which(M == max(M), arr.ind = T)
@@ -232,7 +232,7 @@
       if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
      # }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}   #diferencies  numy
   }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}   #new diferencies  numy
-  
+
 #browser()
 
   #----------------------------------------------------------------------------#
@@ -299,7 +299,7 @@
 
         # If there is an improvement, . . .
           #if (abs(ACC.set - ACC.ref) > th.imp){
-          if ((ACC.set - ACC.ref) < th.imp){   
+          if ((ACC.set - ACC.ref) < th.imp){
             INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
             ACC.Bal <- c(ACC.Bal, ACC.set)
             nV <- nV + 1
@@ -355,7 +355,7 @@
           ACC.set <- max(add2bal.ACC)
 
         # If there is an improvement, . . .
-          if ((ACC.set - ACC.ref) > th.imp){   
+          if ((ACC.set - ACC.ref) > th.imp){
             # Add the included variable
               INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
             # Add the Accuracy value
@@ -407,7 +407,7 @@
     # Variables included
       T1 <- c("NUMERATOR", POS)
       T2 <- c("DENOMINATOR",NEG)
-      
+
     # Parameter to specify the limits for writting
       yl <- max(length(T1), length(T2)) + .5
 
@@ -439,25 +439,26 @@
       ndiv = max(3,floor(yl2))+1;
       lineh <- 0 # 0.5*ceiling(yl-length(T1));
       df2 <- data.frame()
+      colbalance<-colbalance<-"brown3"
       Imp.table2 <- ggplot(df2) + xlim(0, 100) + ylim(-bot, ndiv) + theme_void() +
-        geom_segment(aes(x = 10, y = lineh, xend = 90, yend = lineh),color="red", size=1.3) +
-        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50+escal, yend = lineh-bot),color="red", size=1) +
-        geom_segment(aes(x = 50+escal, y = lineh-bot, xend = 50+escal, yend = lineh),color="red", size=1) +
-        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50-escal, yend = lineh),color="red", size=1) +
+        geom_segment(aes(x = 10, y = lineh, xend = 90, yend = lineh),color=colbalance, size=1.3) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50+escal, yend = lineh-bot),color=colbalance, size=1) +
+        geom_segment(aes(x = 50+escal, y = lineh-bot, xend = 50+escal, yend = lineh),color=colbalance, size=1) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50-escal, yend = lineh),color=colbalance, size=1) +
         annotate("text",
                  x = 75,
                  y = seq(bot, floor(yl2), length.out = ndiv),
                  label = c(T1,rep("",ndiv-length(T1))),
-                 colour = c(rep("royalblue1",length(T1)-1),rep("black",ndiv-length(T1)+1)),
+                 colour = c(rep("black",length(T1)-1),rep(colbalance,ndiv-length(T1)+1)),
                  fontface = 2) +
         annotate("text",
                  x = 25,
                  y = seq(bot, floor(yl2), length.out = ndiv),
                  label = c(T2,rep("",ndiv-length(T2))),
-                 colour = c(rep("royalblue1",length(T2)-1),rep("black",ndiv-length(T2)+1)),
+                 colour = c(rep("black",length(T2)-1),rep(colbalance,ndiv-length(T2)+1)),
                  fontface = 2)
-      
-      
+
+
     #-----------------------------------------#
     # SECOND: The representation of the plots
     #-----------------------------------------#
@@ -491,7 +492,7 @@
           ylab("Balance") +
           xlab("") +
           theme(legend.position = "none")+coord_flip()
-        
+
         # Density plot 1 for the balance
         ydensity <- ggplot(U, aes(V1, fill=y)) +
                     geom_density(alpha=.5, size=1.25) +
@@ -540,7 +541,7 @@
         FINAL.P2 <- arrangeGrob(Imp.table2, BoxP2, ydensity2,
                                ncol=1, nrow=3, widths=4, heights=c(4, 4, 4),
                                vp=viewport(width=0.75, height=1))
-        
+
       } else {
 
         # Fit the regression model
@@ -659,7 +660,7 @@
 #' number of variables. \code{"max"} to define this number as the number of
 #' variables which maximizes the association value or \code{"1se"} to take also
 #' the standard error into account.
-#' @param user_numVar parameter to modify the choosen optimal number of variables. 
+#' @param user_numVar parameter to modify the choosen optimal number of variables.
 #' If it is used, it is the final number of variables used in the method.
 #'
 #'
@@ -967,10 +968,10 @@
 
   # Print a message indicating the number of optimal variables
     cat(paste("\n\n The optimal number of variables is:", opt.M, "\n\n"))
-    
+
 	if (!is.null(user_numVar)){
 		opt.M <- user_numVar;
-	} 
+	}
 
 
     # Define NUM and DEN according to opt.M
@@ -1223,7 +1224,7 @@
     # Build a list with the elements of interest
     L <- list(accuracy.nvar = MSE.Boxplot,
               var.barplot = IMP.plot,
-              global.plot = PLOT.Global$Global.plot, 
+              global.plot = PLOT.Global$Global.plot,
               global.plot2 = PLOT.Global$Global.plot2,
               ROC.plot = PLOT.Global$ROC.plot,
               cv.tab = dat,
@@ -1401,7 +1402,7 @@
 
         # Indices for the highest logit.cor value
         r <- which(M == max(M), arr.ind = T)
-        
+
 
       } else {
         for (i in 2:n){
@@ -1584,9 +1585,9 @@
         # Modify p.set
         ACC.set <- min(add2bal.ACC)
 
-      
+
         # If there is an improvement, . . .
-        #if (abs(ACC.set - ACC.ref) > th.imp){    
+        #if (abs(ACC.set - ACC.ref) > th.imp){
         if ((ACC.set - ACC.ref) < th.imp){
           INC.VAR <- c(INC.VAR, rem.nam[ACC.opt[1]])
           nV <- nV + 1
@@ -1833,30 +1834,31 @@
       yl2 <- yl2*1.05;
       escal <- 3;
       bot <- 5*escal*yl2/100;
-      
+
       # Empty plot 2 with text
       ndiv = max(3,floor(yl2))+1;
       lineh <- 0 # 0.5*ceiling(yl-length(T1));
       df2 <- data.frame()
+      colbalance<-"brown3"
       Imp.table2 <- ggplot(df2) + xlim(0, 100) + ylim(-bot, ndiv) + theme_void() +
-        geom_segment(aes(x = 10, y = lineh, xend = 90, yend = lineh),color="red", size=1.3) +
-        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50+escal, yend = lineh-bot),color="red", size=1) +
-        geom_segment(aes(x = 50+escal, y = lineh-bot, xend = 50+escal, yend = lineh),color="red", size=1) +
-        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50-escal, yend = lineh),color="red", size=1) +
+        geom_segment(aes(x = 10, y = lineh, xend = 90, yend = lineh),color=colbalance, size=1.3) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50+escal, yend = lineh-bot),color=colbalance, size=1) +
+        geom_segment(aes(x = 50+escal, y = lineh-bot, xend = 50+escal, yend = lineh),color=colbalance, size=1) +
+        geom_segment(aes(x = 50-escal, y = lineh-bot, xend = 50-escal, yend = lineh),color=colbalance, size=1) +
         annotate("text",
                  x = 75,
                  y = seq(bot, floor(yl2), length.out = ndiv),
                  label = c(T1,rep("",ndiv-length(T1))),
-                 colour = c(rep("royalblue1",length(T1)-1),rep("black",ndiv-length(T1)+1)),
+                 colour = c(rep("black",length(T1)-1),rep(colbalance,ndiv-length(T1)+1)),
                  fontface = 2) +
         annotate("text",
                  x = 25,
                  y = seq(bot, floor(yl2), length.out = ndiv),
                  label = c(T2,rep("",ndiv-length(T2))),
-                 colour = c(rep("royalblue1",length(T2)-1),rep("black",ndiv-length(T2)+1)),
+                 colour = c(rep("black",length(T2)-1),rep(colbalance,ndiv-length(T2)+1)),
                  fontface = 2)
-      
-      
+
+
 
     #--------------------------------------------------------------------------#
     # STEP 2: the rest of the plots depending on the type of variable
@@ -1920,7 +1922,7 @@
           scale_fill_manual(values = col) +
           theme_bw() + xlab("") + ylab("") +
           theme(legend.position = "none")
-        
+
       # ROC - curve
         library(pROC)
       # Build ROC curve
@@ -1954,7 +1956,9 @@
         FINAL.P2 <- arrangeGrob(Imp.table2, BoxP2, ydensity2,
                                ncol=1, nrow=3, widths=4, heights=c(4, 4, 4),
                                vp=viewport(width=0.75, height=1))
-        
+        # Build a list with the elements of interest
+        L <- list(Global.plot = FINAL.P,Global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
+
 
       } else {
 
@@ -1989,13 +1993,16 @@
                                heights=c(0.2,0.5),vp=viewport(width=0.8,
                                                               height=0.8))
         FINAL.P2 = FINAL.P;
+
+        # Build a list with the elements of interest
+
+        L <- list(Global.plot = FINAL.P,Global.plot2 = FINAL.P2)
+
       }
 
-      # Build a list with the elements of interest
-      L <- list(Global.plot = FINAL.P,Global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
-      
+
       return(L)
-      
+
 #      return(FINAL.P)
 
     }
@@ -2005,19 +2012,19 @@
   #------------------------------------------------------------------------------#
   #                           AUXILIARY FUNCTIONS
   #------------------------------------------------------------------------------#
-  
+
   #------------------------------------------------------------------------------#
   # NAME: rename_OTU
   # FUNCTION: it renames the rows of an phyloseq object not to have repeated
   #           names. The idea is to write at genus level for example,
   #                       f_Lactobacillales_g_unclassified
-  
+
   # INPUT:    a "phyloseq" object with @tax_table information and the rank
   #           given as a number of the column of @tax_table.
   # OUTPUT:   the "taxonomyTable" object with non-repeated modified names.
   #------------------------------------------------------------------------------#
-  
-  
+
+
   #' Rename each taxon
   #'
   #' \code{rename_OTU} assigns a non - repeated name to each bacteria for a given
@@ -2037,23 +2044,23 @@
   #' and none of them starts with \emph{Incertae_Sedis} or \emph{unclassified}.
   #'
   #' @export rename_OTU
-  
-  
+
+
   rename_OTU <- function(phy,rank, db ="SILVA"){
-    
+
     # Test if the objects are from the expected class
     stopifnot(class(phy) == "phyloseq")
     stopifnot(class(rank) == "numeric")
     # Rank abbreviation (Kingdom, Phylum, Class, Order, Family, Genus, Specie)
     Ranking<-c("k","p","c","o","f","g","s")
-    
-    
+
+
     ################################################################################
     # AUXILIAR FUNCTION
     ################################################################################
-    
+
     replace_rare <- function(j, rk, tax_table, Nam, Ranking, db){
-      
+
       # The column of tax_table we are working on
       u <- rk[j]
       # The first previous column which is not "unclassified"
@@ -2072,7 +2079,7 @@
                    paste(unlist(strsplit(Nam[j],split="_"))[-c(1:2)],
                          collapse = "_"),
                    sep="_")}
-        
+
         # . . . else if the name is Incertae_Sedis
       } else if (tax_table[j,u]=="Incertae_Sedis"){
         while(tax_table[j,u] %in% c("unclassified", "Incertae_Sedis")){
@@ -2088,13 +2095,13 @@
                    sep="_")
         }
       }
-      
+
       # Return V
       return(V)
     }
-    
+
     ################################################################################
-    
+
     # Vector with initial names
     Nam<-phy@tax_table[,rank]
     if (db=="SILVA"){Nam <- paste(Ranking[rank],Nam,sep="_")}
@@ -2106,8 +2113,8 @@
     i<-1
     # A vector with the rank of the name (initially rank value)
     rk <- rep(rank, length(Nam))
-    
-    
+
+
     # While r>1 (while there are repeated names)
     while (r>1){
       # Repeated names
@@ -2129,10 +2136,10 @@
       # Modify r as the number of the maximum repeated name
       r<-max(table(Nam))
       i<-i+1
-      
+
     }
-    
-    
+
+
     # Load library
     library(qdapRegex)
     # Extract the first value for each name
@@ -2151,18 +2158,18 @@
                                          Ranking,
                                          db)
       }
-      
+
     }
-    
+
     return(Nam)
   }
-  
+
   ################################################################################
-  
+
   #------------------------------------------------------------------------------#
   # Auxiliar function in order to replace zeros if necesary
   #------------------------------------------------------------------------------#
-  
+
   #' Zero replacement for compositional data
   #'
   #' \code{cmultRepl2} replaces the zeros for a matrix where each row is
@@ -2190,11 +2197,11 @@
   #'
   #'
   #' @export cmultRepl2
-  
-  
-  
+
+
+
   cmultRepl2 <- function(x, zero.rep = "bayes"){
-    
+
     # Load library
     library(zCompositions)
     # If there are zeros, use cmultRepl
@@ -2208,10 +2215,10 @@
     # Return new.x
     return(new.x)
   }
-  
+
   #------------------------------------------------------------------------------#
-  
-  
+
+
   #------------------------------------------------------------------------------#
   # NAME: plot.tab
   # INPUT:
@@ -2220,8 +2227,8 @@
   #          appearing in the numerator and in the denominator respectively.
   # OUTPUT: a plot with the information given in dat (for the first five columns)
   #------------------------------------------------------------------------------#
-  
-  
+
+
   #' Plots the cross - validated summary table
   #'
   #'
@@ -2265,8 +2272,8 @@
   #'   plot.tab(CV.Bal[[4]])
   #'
   #' @export plot.tab
-  
-  
+
+
   plot.tab <- function(dat, col = c("steelblue1","tomato1")){
     # Load library
     library(gtable)
@@ -2277,7 +2284,7 @@
     # Modify dat
     dat.l<-data.frame(cbind(c(" ",row.names(dat)),rbind(colnames(dat),dat)))
     row.names(dat.l)<-colnames(dat.l)<-NULL
-    
+
     # Build my.data2 with the row.names(my.data) as a first column
     dat2<-dat.l
     dat2<-apply(dat2,2,function(x) as.character(x))
@@ -2292,76 +2299,76 @@
     dat2[,1]<-dat2[1,] <- 1
     dat2[-1,2]<- 0
     dat2[nr,]<- 0
-    
+
     # Information but the last linefor colors
     Letra <- as.character(factor(dat2, labels=c("black", "gray15", col[2],
                                                 col[1])))
-    
+
     # Delete words from dat, only selecting the numbers
     dat1<-dat.l
     dat1[-c(1,nrow(dat1)),-c(1,2)]<-" "
     dat1[is.na(dat1)]<-" "
-    
+
     # Filling colors
     fill <- as.character(factor(t(dat2),labels=c("white", "gray85", col[2],
                                                  col[1])))
     # Define the background of cells
     fill <- lapply(seq_len(n), function(ii) rectGrob(gp=gpar(fill=fill[ii])))
-    
+
     # Some calculations for cell sizes
     row_heights <- function(m){
       do.call(unit.c, apply(m, 1, function(l)
         max(do.call(unit.c, lapply(l, grobHeight)))))
     }
-    
+
     col_widths <- function(m){
       do.call(unit.c, apply(m, 2, function(l)
         max(do.call(unit.c, lapply(l, grobWidth)))))
     }
-    
+
     # Object as matrix
     label_matrix <- as.matrix(dat1)
-    
+
     nc <- ncol(label_matrix)
     nr <- nrow(label_matrix)
     n <- nc*nr
-    
+
     # Text written in the table
     # Auxiliar values for text justification
     pos <- rep(c(0.5, rep(0.96,nr-2),0.5),nc)
     jus <- rep(c(0.5, rep(1,nr-2),0.5),nc)
     # Third column centered
     pos[(nr +1):(2*nr)] <- jus[(nr+1):(2*nr)] <- 0.5
-    
+
     # Define the text characteristics
     labels <- lapply(seq_len(n), function(ii)
       textGrob(label_matrix[ii],x=pos[ii],
                just=jus[ii],
                gp=gpar(fontface="bold",col=Letra[ii])))
     label_grobs <- matrix(labels, ncol=nc)
-    
+
     # Place labels in a gtable
     g <- gtable_matrix("table", grobs=label_grobs,
                        widths=col_widths(label_grobs) + unit(8,"mm"),
                        heights=row_heights(label_grobs) + unit(5,"mm"))
-    
+
     # Add the background
     g <- gtable_add_grob(g, fill, t=rep(seq_len(nr), each=nc),
                          l=rep(seq_len(nc), nr), z=0, name="fill")
     # Graphical representation
     grid.draw(g)
-    
+
   }
-  
+
   #------------------------------------------------------------------------------#
-  
-  
-  
-  
+
+
+
+
   ################################################################################
   # FUNCTION: logit.cor
   ################################################################################
-  
+
   #' Computes an association value  between a dichotomous variable and a
   #' continuous one.
   #'
@@ -2380,11 +2387,11 @@
   #'
   #'
   #' @export logit.cor
-  
+
   # Define the function logit.cor
   logit.cor <- function(FIT, y, covar = NULL,logit.acc){
     if (logit.acc == "AUC"){
-      #d <- as.numeric(auc(y, FIT$fitted.values)) # 
+      #d <- as.numeric(auc(y, FIT$fitted.values)) #
       if (class(y) == "factor") {numy<-as.numeric(y)-1} else {numy<-y} #new diferences
       d <- as.numeric(auc(numy, FIT$fitted.values)) # new diferences
     } else if (logit.acc == "Rsq"){
@@ -2402,18 +2409,18 @@
       # }
       # d<-1-(deviance(FIT)/nulldev0)  # proportion of explained deviance
     }
-    
+
     # Return the value
     return(d)
   }
-  
+
   #------------------------------------------------------------------------------#
-  
-  
+
+
   ################################################################################
   # FUNCTION: rowM
   ################################################################################
-  
+
   #' Calculates the mean of each row of a matrix (though having only one column).
   #'
   #'
@@ -2435,13 +2442,12 @@
   #'   rowM(M)
   #'
   #' @export rowM
-  
+
   # Define the function rowM
   rowM <- function(x){
     if(is.vector(x)) {u <- x
     } else { u <- rowMeans(x)}
     return(u)
   }
-  
+
   #------------------------------------------------------------------------------#
-  
