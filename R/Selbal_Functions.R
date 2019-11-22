@@ -571,7 +571,9 @@
         FINAL.P <- arrangeGrob(Imp.table, PLOT.G, nrow=2,
                                heights=c(0.2,0.5),vp=viewport(width=0.8,
                                                               height=0.8))
-        FINAL.P2 = FINAL.P;
+        FINAL.P2 <- arrangeGrob(Imp.table2, PLOT.G, nrow=2,
+                                  heights=c(1,2),vp=viewport(width=0.8,
+                                                                 height=0.8))
       }
 
       # Draw the plot if draw == T
@@ -1992,7 +1994,9 @@
         FINAL.P <- arrangeGrob(Imp.table, PLOT.G, nrow=2,
                                heights=c(0.2,0.5),vp=viewport(width=0.8,
                                                               height=0.8))
-        FINAL.P2 = FINAL.P;
+        FINAL.P2 <- arrangeGrob(Imp.table2, PLOT.G, nrow=2,
+                                heights=c(1,2),vp=viewport(width=0.8,
+                                                               height=0.8))
 
         # Build a list with the elements of interest
 
