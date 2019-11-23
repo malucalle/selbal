@@ -163,8 +163,8 @@
         FIT.pos <- glm(numy~., data=D.pos, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
         if(classy=="numeric"){ C.pos <- mean(FIT.pos$residuals^2)
-        }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)} #diferencies
-
+     #   }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)} #diferencies
+        }else{ C.pos <- logit.cor(FIT.pos,y,covar = covar, logit.acc)} #diferencies
       #----------------------------------------#
       # If x added into the numerator, . .
       #----------------------------------------#
@@ -183,7 +183,8 @@
         FIT.neg <- glm(numy~., data=D.neg, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
         if(classy=="numeric"){ C.neg <- mean(FIT.neg$residuals^2)
-        }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}  #diferencies
+        #}else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}  #diferencies
+        }else{ C.neg <- logit.cor(FIT.neg,y,covar = covar, logit.acc)}  #diferencies
 
       # Correlation values
         COR <- c(C.pos, C.neg)
@@ -230,8 +231,8 @@
 
     # Define the initial "accuracy" or "association" value
       if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
-     # }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}   #diferencies  numy
-  }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}   #new diferencies  numy
+      }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}   #diferencies  numy
+    #  }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}   #new diferencies  numy
 
 #browser()
 
@@ -1456,7 +1457,8 @@
       FIT.pos <- glm(numy~., data=D.pos, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
       if(classy=="numeric"){ C.pos <- mean(FIT.pos$residuals^2)
-      }else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}#diferencies covar
+      #}else{ C.pos <- logit.cor(FIT.pos,numy,covar = covar, logit.acc)}#diferencies covar
+      }else{ C.pos <- logit.cor(FIT.pos,y,covar = covar, logit.acc)}#diferencies covar
 
       #----------------------------------------#
       # If x added into the numerator, . .
@@ -1476,8 +1478,8 @@
       FIT.neg <- glm(numy~., data=D.neg, family=f.class)
       # The MSE or the corresponding value for dichotomous responses
       if(classy=="numeric"){ C.neg <- mean(FIT.neg$residuals^2)
-      }else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}  #diferencies covar
-
+      #}else{ C.neg <- logit.cor(FIT.neg,numy,covar = covar, logit.acc)}  #diferencies covar
+      }else{ C.neg <- logit.cor(FIT.neg,y,covar = covar, logit.acc)}  #diferencies covar
       # Correlation values
       COR <- c(C.pos, C.neg)
       # Return the values
@@ -1532,7 +1534,8 @@
 
     # Define the initial "accuracy" or "association" value
     if(classy=="numeric"){ ACC.Bal <- mean(FIT.initial$residuals^2)
-    }else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}#diferencies covar
+    #}else{ ACC.Bal <- logit.cor(FIT.initial, numy, covar = covar, logit.acc)}#diferencies covar
+    }else{ ACC.Bal <- logit.cor(FIT.initial, y, covar = covar, logit.acc)}#diferencies covar
 
 
     #----------------------------------------------------------------------------#
