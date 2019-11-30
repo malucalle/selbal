@@ -539,10 +539,16 @@
         FINAL.P <- arrangeGrob(Imp.table, ROC.plot, BoxP, ydensity,
                                ncol=2, nrow=2, widths=c(5,1.25), heights=c(2, 5),
                                vp=viewport(width=0.8, height=0.8))
-        FINAL.P2 <- arrangeGrob(Imp.table2, BoxP2, ydensity2,
-                               ncol=1, nrow=3, widths=4, heights=c(4, 4, 4),
-                               vp=viewport(width=0.75, height=1))
-
+        
+        library(gtable)
+        g1 <- ggplotGrob(Imp.table2)
+        g2 <- ggplotGrob(BoxP2)
+        g3 <- ggplotGrob(ydensity2)
+        g <- rbind(g1, g2, size = "first")
+        g <- rbind(g, g3, size = "first")
+        g$widths <- unit.pmax(g1$widths,g2$widths)
+        FINAL.P2 <- g
+      
       } else {
 
         # Fit the regression model
@@ -1958,9 +1964,17 @@
         FINAL.P <- arrangeGrob(Imp.table, ROC.plot, BoxP, ydensity,
                                ncol=2, nrow=2, widths=c(5,1), heights=c(2, 5),
                                vp=viewport(width=0.8, height=0.8))
-        FINAL.P2 <- arrangeGrob(Imp.table2, BoxP2, ydensity2,
-                               ncol=1, nrow=3, widths=4, heights=c(4, 4, 4),
-                               vp=viewport(width=0.75, height=1))
+
+        library(gtable)
+        g1 <- ggplotGrob(Imp.table2)
+        g2 <- ggplotGrob(BoxP2)
+        g3 <- ggplotGrob(ydensity2)
+        g <- rbind(g1, g2, size = "first")
+        g <- rbind(g, g3, size = "first")
+        g$widths <- unit.pmax(g1$widths,g2$widths)
+        FINAL.P2 <- g
+        
+        
         # Build a list with the elements of interest
         L <- list(Global.plot = FINAL.P,Global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
 
