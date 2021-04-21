@@ -513,7 +513,7 @@
       # ROC - curve
         library(pROC)
       # Build ROC curve
-        A<-roc(response = U$numy,predictor = FIT.final$fitted.values)
+        A<-roc(response = U$numy,predictor = FIT.final$fitted.values, quiet = TRUE)
       # Extract the sensitivity and specificiti values
         ROC.TAB <- data.frame(x=1-A$specificities, y=A$sensitivities)
       # Order them for a correct representation
@@ -1937,7 +1937,7 @@
       # ROC - curve
         library(pROC)
       # Build ROC curve
-        A<-roc(response = U$numy,predictor = FIT.final$fitted.values)
+        A<-roc(response = U$numy,predictor = FIT.final$fitted.values, quiet = TRUE)
       # Extract the sensitivity and specificity value
         ROC.TAB <- data.frame(x=1-A$specificities, y=A$sensitivities)
       # Order them for a correct representation
