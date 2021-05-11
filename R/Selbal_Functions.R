@@ -511,7 +511,7 @@
           theme(legend.position = "none")
 
       # ROC - curve
-        library(pROC)
+       suppressMessages(library(pROC))
       # Build ROC curve
         A<-roc(response = U$numy,predictor = FIT.final$fitted.values, quiet = TRUE)
       # Extract the sensitivity and specificiti values
