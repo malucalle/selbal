@@ -8,21 +8,12 @@
 
 ### Installation
 
-To get a full access to the functions implemented in `selbal` we only need to run 
-the following instructions:
-
-```
 # Installing the files in the repository
-  # Option 1 (non - Windows users)
-    devtools::install_github(repo = "UVic-omics/selbal")
-  # Option 2 (for Windows users)
-    devtools::install_url(url="https://github.com/UVic-omics/selbal/archive/master.zip", 
-                INSTALL_opt= "--no-multiarch")
-    
+devtools::install_github(repo = "malucalle/selbal")
+
 # Loading the library
   library("selbal")
-```
-
+  
 ### Running `selbal`
 
 To start using `selbal` we recomend to:
@@ -30,7 +21,7 @@ To start using `selbal` we recomend to:
 - Read the manuscript [https://msystems.asm.org/content/3/4/e00053-18]
 - Use the `help()` functions for getting a detailed instructions of their
   use.
-- Read the associated vignette (see  https://htmlpreview.github.io/?https://github.com/UVic-omics/selbal/blob/master/vignettes/vignette.html).
+- Read the associated vignette (see  https://htmlpreview.github.io/?https://github.com/malucalle/selbal/blob/master/vignettes/vignette.html).
 
 
 
