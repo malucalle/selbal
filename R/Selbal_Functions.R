@@ -392,6 +392,16 @@
       FINAL.BAL <- sqrt((k1*k2)/(k1+k2))*
         (rowM(logCounts[,POS])- rowM(logCounts[,NEG]))
 
+  #----------------------------------------------------------------------------#
+  # FINAL GLM
+  #----------------------------------------------------------------------------#
+				  
+    # Auxiliar data.frame for graphical representation
+      U <- data.frame(dat, FINAL.BAL)
+      colnames(U)[ncol(U)] <- "V1"
+    # Regression model
+      FIT.final <- glm(numy~., data=U, family = f.class)				  
+				  
   # Draw the plot if draw == T
   if (draw){
   #----------------------------------------------------------------------------#
@@ -463,12 +473,6 @@
     #-----------------------------------------#
     # SECOND: The representation of the plots
     #-----------------------------------------#
-
-    # Auxiliar data.frame for graphical representation
-      U <- data.frame(dat, FINAL.BAL)
-      colnames(U)[ncol(U)] <- "V1"
-    # Regression model
-      FIT.final <- glm(numy~., data=U, family = f.class)
 
     # The plot depending of the class of the response variable
       if (classy=="factor"){
