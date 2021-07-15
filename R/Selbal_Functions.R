@@ -597,14 +597,14 @@
     		  L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL, global.plot=FINAL.P,
                       FIT.final,global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
     		} else {
-    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL)
+    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL,FIT.final)
        	}
     } else {
     		if (draw== TRUE){
     			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, global.plot=FINAL.P,
                       FIT.final,global.plot2 = FINAL.P, ROC.plot = ROC.plot)
     		} else {
-    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal)
+    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal,FIT.final)
        	}
     }
 
