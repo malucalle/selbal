@@ -598,17 +598,17 @@
         EVOL[,3]<-round(as.numeric(EVOL[,3]),5)
         EVOL[,4]<-round(as.numeric(EVOL[,4]),5)
     		if (draw== TRUE){
-    		  L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL, global.plot=FINAL.P,
-                      FIT.final,global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
+    		  L <- list(balance.values=FINAL.BAL, numerator=POS, denominator=NEG, balance=INC.VAR, accuracy=ACC.Bal, balance.selection=EVOL, global.plot=FINAL.P,
+                      glm=FIT.final, global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
     		} else {
-    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, EVOL,FIT.final)
+    			L <- list(balance.values=FINAL.BAL, numerator=POS, denominator=NEG, balance=INC.VAR, accuracy=ACC.Bal, balance.selection=EVOL, glm=FIT.final)
        	}
     } else {
     		if (draw== TRUE){
-    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal, global.plot=FINAL.P,
-                      FIT.final,global.plot2 = FINAL.P, ROC.plot = ROC.plot)
+    			L <- list(balance.values=FINAL.BAL, numerator=POS, denominator=NEG, balance=INC.VAR, accuracy=ACC.Bal, global.plot=FINAL.P,
+                      glm=FIT.final,global.plot2 = FINAL.P, ROC.plot = ROC.plot)
     		} else {
-    			L <- list(FINAL.BAL, POS, NEG, INC.VAR, ACC.Bal,FIT.final)
+    			L <- list(balance.values=FINAL.BAL, numerator=POS, denominator=NEG, balance=INC.VAR, accuracy=ACC.Bal, glm=FIT.final)
        	}
     }
 
