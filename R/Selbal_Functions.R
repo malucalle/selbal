@@ -1196,10 +1196,10 @@
 
     # Order RESUME.BAL by FREQ
     RESUME.BAL <- RESUME.BAL[,c(ncol(RESUME.BAL), ncol(RESUME.BAL)-1,
-                                order(RESUME.BAL[nrow(RESUME.BAL),
-                                                 -c(ncol(RESUME.BAL),
-                                                    ncol(RESUME.BAL)-1)],
-                                      decreasing = T))]
+                            order(as.numeric(RESUME.BAL[nrow(RESUME.BAL),
+                                             -c(ncol(RESUME.BAL),
+                                                ncol(RESUME.BAL)-1)],
+                                  decreasing = T)))]
 
     # No frequency for the Global balance and the CV.Balance
     RESUME.BAL[nrow(RESUME.BAL),1:2]<- "-"
