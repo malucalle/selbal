@@ -838,7 +838,7 @@
         covar.test<-covar[-train.idx,]
 
         # Compute the balances for the training data set
-        BAL <- selbal.aux(x.train, y.train, th.imp = 0, covar = covar.train,
+        BAL <- (x.train, y.train, th.imp = 0, covar = covar.train,
                           logit.acc, logt=F, maxV = maxV)
 
         # Variables included in the balance (as NUMERATOR | DENOMINATOR)
@@ -931,7 +931,7 @@
 
     # CV - procedure computed in parallel
     INTEREST <- foreach(h=1:n.iter,
-                        .export=c("logit.cor", "rowM","selbal.aux", "bal.value",
+                        .export=c("logit.cor", "rowM","", "bal.value",
                                   "logit.acc", "cmultRepl","cmultRepl2"),
                         .combine='comb',
                         .multicombine=TRUE,
@@ -988,7 +988,7 @@
 
 
     # Define NUM and DEN according to opt.M
-    suppressMessages(BAL <- selbal.aux(x, y, th.imp = 0, covar = covar,
+    suppressMessages(BAL <- (x, y, th.imp = 0, covar = covar,
                                        logit.acc, logt=T, maxV = opt.M)) #diferencies logit.acc=logit.acc
   # Variables in the NUMERATOR and the DENOMINATOR
     NUM <- BAL[BAL[,2]=="NUM","Taxa"]
@@ -1506,9 +1506,9 @@
 
     # Define the first balance
     A1 <- first.bal(logCounts, Y = numy, covar=covar)
-    # Variables taking parti into the first balance
-    POS <- colnames(x)[A1[1,1]]
-    NEG <- colnames(x)[A1[1,2]]
+    # Variables taking part into the first balance
+    POS <- colnames(logCounts)[A1[1,1]]
+    NEG <- colnames(logCounts)[A1[1,2]]
 
     # Included variables in the model
     INC.VAR <- c(POS, NEG)
