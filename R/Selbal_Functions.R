@@ -838,7 +838,7 @@
         covar.test<-covar[-train.idx,]
 
         # Compute the balances for the training data set
-        BAL <- (x.train, y.train, th.imp = 0, covar = covar.train,
+        BAL <- selbal.aux(x.train, y.train, th.imp = 0, covar = covar.train,
                           logit.acc, logt=F, maxV = maxV)
 
         # Variables included in the balance (as NUMERATOR | DENOMINATOR)
@@ -931,7 +931,7 @@
 
     # CV - procedure computed in parallel
     INTEREST <- foreach(h=1:n.iter,
-                        .export=c("logit.cor", "rowM","", "bal.value",
+                        .export=c("logit.cor", "rowM","selbal.aux", "bal.value",
                                   "logit.acc", "cmultRepl","cmultRepl2"),
                         .combine='comb',
                         .multicombine=TRUE,
@@ -988,7 +988,7 @@
 
 
     # Define NUM and DEN according to opt.M
-    suppressMessages(BAL <- (x, y, th.imp = 0, covar = covar,
+    suppressMessages(BAL <- selbal.aux(x, y, th.imp = 0, covar = covar,
                                        logit.acc, logt=T, maxV = opt.M)) #diferencies logit.acc=logit.acc
   # Variables in the NUMERATOR and the DENOMINATOR
     NUM <- BAL[BAL[,2]=="NUM","Taxa"]
