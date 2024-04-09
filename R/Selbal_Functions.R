@@ -37,9 +37,6 @@
     # Load library
       suppressMessages(library(zCompositions))
 
-    # Variables name
-      var.nam <- rem.nam <- colnames(x)
-
     # Build a table with the response variable and covariates for correction
       if (!is.null(covar)){ dat <- data.frame(cbind(numy, covar))
       } else { dat <-data.frame(numy)}
@@ -49,6 +46,10 @@
       } else{
         logCounts <- log(cmultRepl2(x, zero.rep = zero.rep))
       }
+
+    # Variables name
+    var.nam <- rem.nam <- colnames(logCounts)
+
 
 
     #--------------------------------------------------------------------------#
@@ -202,8 +203,8 @@
     # Define the first balance
       A1 <- first.bal(logCounts, Y = numy, covar=covar)
     # Variables taking parti into the first balance
-      POS <- colnames(x)[A1[1,1]]
-      NEG <- colnames(x)[A1[1,2]]
+      POS <- colnames(logCounts)[A1[1,1]]
+      NEG <- colnames(logCounts)[A1[1,2]]
 
     # Included variables in the model
       INC.VAR <- c(POS, NEG)
@@ -395,13 +396,13 @@
   #----------------------------------------------------------------------------#
   # FINAL GLM
   #----------------------------------------------------------------------------#
-				  
+
     # Auxiliar data.frame for graphical representation
       U <- data.frame(dat, FINAL.BAL)
       colnames(U)[ncol(U)] <- "V1"
     # Regression model
-      FIT.final <- glm(numy~., data=U, family = f.class)				  
-				  
+      FIT.final <- glm(numy~., data=U, family = f.class)
+
   # Draw the plot if draw == T
   if (draw){
   #----------------------------------------------------------------------------#
@@ -543,7 +544,7 @@
         FINAL.P <- arrangeGrob(Imp.table, ROC.plot, BoxP, ydensity,
                                ncol=2, nrow=2, widths=c(5,1.25), heights=c(2, 5),
                                vp=viewport(width=0.8, height=0.8))
-        
+
         library(gtable)
         g1 <- ggplotGrob(Imp.table2)
         g2 <- ggplotGrob(BoxP2)
@@ -552,7 +553,7 @@
         g <- rbind(g, g3, size = "first")
         g$widths <- unit.pmax(g1$widths,g2$widths)
         FINAL.P2 <- g
-      
+
       } else {
 
         # Fit the regression model
@@ -1040,10 +1041,10 @@
 
     }else{
       df.boxplot <- data.frame(mean = ACC.mean, se = ACC.se, n =2:maxV)
-	  ylabelName="Accuracy (AUC)";
-	  if (logit.acc=="Dev"){
-		ylabelName="Explained Deviance";
-	  }
+	    ylabelName="Accuracy (AUC)";
+	    if (logit.acc=="Dev"){
+		    ylabelName="Explained Deviance";
+	    }
       # Load library
       library(ggplot2)
       # The plot
@@ -1342,20 +1343,18 @@
     # Load library
     suppressMessages(library(zCompositions))
 
-    # Variables name
-    var.nam <- rem.nam <- colnames(x)
-
     # Build a table with the response variable and covariates for correction
     if (!is.null(covar)){ dat <- data.frame(cbind(numy, covar))
     } else { dat <-data.frame(numy)}
-
-
 
     # The logCounts (with zero replacement)
     if (logt == F){ logCounts <- x
     } else{
       logCounts <- log(cmultRepl2(x, zero.rep = zero.rep))
     }
+
+    # Variables name
+    var.nam <- rem.nam <- colnames(logCounts)
 
 
     #--------------------------------------------------------------------------#
@@ -1977,8 +1976,8 @@
         g <- rbind(g, g3, size = "first")
         g$widths <- unit.pmax(g1$widths,g2$widths)
         FINAL.P2 <- g
-        
-        
+
+
         # Build a list with the elements of interest
         L <- list(Global.plot = FINAL.P,Global.plot2 = FINAL.P2, ROC.plot = ROC.plot)
 
