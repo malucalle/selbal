@@ -1041,10 +1041,10 @@
 
     }else{
       df.boxplot <- data.frame(mean = ACC.mean, se = ACC.se, n =2:maxV)
-	  ylabelName="Accuracy (AUC)";
-	  if (logit.acc=="Dev"){
-		ylabelName="Explained Deviance";
-	  }
+	    ylabelName="Accuracy (AUC)";
+	    if (logit.acc=="Dev"){
+		    ylabelName="Explained Deviance";
+	    }
       # Load library
       library(ggplot2)
       # The plot
@@ -1343,20 +1343,18 @@
     # Load library
     suppressMessages(library(zCompositions))
 
-    # Variables name
-    var.nam <- rem.nam <- colnames(x)
-
     # Build a table with the response variable and covariates for correction
     if (!is.null(covar)){ dat <- data.frame(cbind(numy, covar))
     } else { dat <-data.frame(numy)}
-
-
 
     # The logCounts (with zero replacement)
     if (logt == F){ logCounts <- x
     } else{
       logCounts <- log(cmultRepl2(x, zero.rep = zero.rep))
     }
+
+    # Variables name
+    var.nam <- rem.nam <- colnames(logCounts)
 
 
     #--------------------------------------------------------------------------#
