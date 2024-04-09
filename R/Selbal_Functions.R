@@ -37,9 +37,6 @@
     # Load library
       suppressMessages(library(zCompositions))
 
-    # Variables name
-      var.nam <- rem.nam <- colnames(x)
-
     # Build a table with the response variable and covariates for correction
       if (!is.null(covar)){ dat <- data.frame(cbind(numy, covar))
       } else { dat <-data.frame(numy)}
@@ -49,6 +46,10 @@
       } else{
         logCounts <- log(cmultRepl2(x, zero.rep = zero.rep))
       }
+
+    # Variables name
+    var.nam <- rem.nam <- colnames(logCounts)
+
 
 
     #--------------------------------------------------------------------------#
