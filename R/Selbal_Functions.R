@@ -37,9 +37,6 @@
     # Load library
       suppressMessages(library(zCompositions))
 
-    # Variables name
-      var.nam <- rem.nam <- colnames(x)
-
     # Build a table with the response variable and covariates for correction
       if (!is.null(covar)){ dat <- data.frame(cbind(numy, covar))
       } else { dat <-data.frame(numy)}
@@ -50,7 +47,9 @@
         logCounts <- log(cmultRepl2(x, zero.rep = zero.rep))
       }
 
-
+    # Variables name
+      var.nam <- rem.nam <- colnames(x)
+	  
     #--------------------------------------------------------------------------#
     # 0.3: auxiliar functions
     #--------------------------------------------------------------------------#
@@ -202,8 +201,8 @@
     # Define the first balance
       A1 <- first.bal(logCounts, Y = numy, covar=covar)
     # Variables taking parti into the first balance
-      POS <- colnames(x)[A1[1,1]]
-      NEG <- colnames(x)[A1[1,2]]
+      POS <- colnames(logCounts)[A1[1,1]]
+      NEG <- colnames(logCounts)[A1[1,2]]
 
     # Included variables in the model
       INC.VAR <- c(POS, NEG)
@@ -1342,9 +1341,6 @@
     # Load library
     suppressMessages(library(zCompositions))
 
-    # Variables name
-    var.nam <- rem.nam <- colnames(x)
-
     # Build a table with the response variable and covariates for correction
     if (!is.null(covar)){ dat <- data.frame(cbind(numy, covar))
     } else { dat <-data.frame(numy)}
@@ -1357,6 +1353,9 @@
       logCounts <- log(cmultRepl2(x, zero.rep = zero.rep))
     }
 
+    # Variables name
+    var.nam <- rem.nam <- colnames(x)
+	  
 
     #--------------------------------------------------------------------------#
     # 0.3: auxiliar functions
