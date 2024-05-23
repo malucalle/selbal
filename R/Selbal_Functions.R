@@ -1354,7 +1354,7 @@
     }
 
     # Variables name
-    var.nam <- rem.nam <- colnames(x)
+    var.nam <- rem.nam <- colnames(logCounts)
 	  
 
     #--------------------------------------------------------------------------#
