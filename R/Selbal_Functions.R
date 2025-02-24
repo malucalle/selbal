@@ -2231,7 +2231,7 @@
     # If there are zeros, use cmultRepl
     if(sum(x==0)!=0){
       if (zero.rep =="bayes"){
-        new.x <- cmultRepl(x, suppress.print = T)
+	new.x <- cmultRepl(x, z.delete = FALSE , suppress.print = T)
       } else if (zero.rep =="one"){
         new.x <- x + 1
       }
